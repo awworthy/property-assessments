@@ -1,10 +1,11 @@
-# Property Assessments Final Project
-## Contents:
-- Members
+# README
+## Property Assessments Final Project
+## README Contents:
+- Collaborators
 - Core Project
 - Custom Features
 
-### Members
+### Collaborators
 - [Alex](https://github.com/awworthy)
 - [Shea](https://github.com/odlands)
 - [Dakota](https://github.com/DakotaDoolaege)
