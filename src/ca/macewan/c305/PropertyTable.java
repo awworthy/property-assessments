@@ -78,7 +78,7 @@ public class PropertyTable extends Application {
         primaryStage.show();
     }
 
-    public void configureTable() throws IOException {
+    private void configureTable() {
         table = new TableView<>();
 
         properties = FXCollections.observableArrayList(propertyAssessments.getPropertyAssessments());
@@ -160,7 +160,7 @@ public class PropertyTable extends Application {
         return n;
     }
 
-    public VBox addVBox() {
+    private VBox addVBox() {
         VBox vbox = new VBox();
         vbox.setPadding(new Insets(12,10,10,10));
         vbox.setSpacing(10);
@@ -188,14 +188,25 @@ public class PropertyTable extends Application {
             String account = accountField.getText().strip();
             String address = addressField.getText().strip();
             String neighbourhood = neighbourhoodField.getText().strip();
+            String assessmentClass = (String)classBox.getValue();
 
-            if (account != "") {
-                PropertyAssessments accountAssessments = propertyAssessments.getAssessmentsByAccount(account);
-                properties = FXCollections.observableArrayList(accountAssessments.getPropertyAssessments());
-                if (neighbourhood != "")
-                    properties = FXCollections.observableArrayList(accountAssessments.getAssessmentsByNeighbourhood(neighbourhood).getPropertyAssessments());
-            } else if (neighbourhood != "") {
-                properties = FXCollections.observableArrayList(propertyAssessments.getAssessmentsByNeighbourhood(neighbourhood).getPropertyAssessments());
+            PropertyAssessments searchAssessments = propertyAssessments;
+
+            if (!account.equals("")) {
+                searchAssessments = searchAssessments.getAssessmentsByAccount(account);
+                properties = FXCollections.observableArrayList(searchAssessments.getPropertyAssessments());
+            }
+            if (!neighbourhood.equals("")) {
+                searchAssessments = searchAssessments.getAssessmentsByNeighbourhood(neighbourhood);
+                properties = FXCollections.observableArrayList(searchAssessments.getPropertyAssessments());
+            }
+            if (!address.equals("")) {
+                searchAssessments = searchAssessments.getAssessmentsByAddress(address);
+                properties = FXCollections.observableArrayList(searchAssessments.getPropertyAssessments());
+            }
+            if (assessmentClass != null) {
+                searchAssessments = searchAssessments.getAssessmentsByClass(assessmentClass);
+                properties = FXCollections.observableArrayList(searchAssessments.getPropertyAssessments());
             }
 
             table.setItems(properties);
@@ -208,6 +219,7 @@ public class PropertyTable extends Application {
             accountField.clear();
             addressField.clear();
             neighbourhoodField.clear();
+            classBox.setValue(null);
 
             properties = FXCollections.observableArrayList(propertyAssessments.getPropertyAssessments());
             table.setItems(properties);

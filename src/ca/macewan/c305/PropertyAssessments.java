@@ -1,5 +1,7 @@
 package ca.macewan.c305;
 
+import javafx.beans.property.Property;
+
 import java.util.*;
 
 /**
@@ -56,6 +58,19 @@ public class PropertyAssessments {
 
         }
         return neighbourhoodAssessments;
+    }
+
+    public PropertyAssessments getAssessmentsByAddress(String inputAddress) {
+        PropertyAssessments addressAssessments = new PropertyAssessments();
+
+        for (PropertyAssessment propertyAssessment : this.propertyAssessmentsList) {
+            String thisAddress = propertyAssessment.getAddress().toString();
+
+            if (thisAddress.contains(inputAddress.toUpperCase())) {
+                addressAssessments.addPropertyAssessment(propertyAssessment);
+            }
+        }
+        return addressAssessments;
     }
 
     public Set<String> getClassSet() {
