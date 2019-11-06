@@ -39,11 +39,7 @@ public class Address {
     }
 
     public String toString() {
-        if (this.suite.length() > 0) {
-            return this.suite + " " + this.houseNum + " " + this.streetName;
-        } else {
-            return this.houseNum + " " + this.streetName;
-        }
+        return (this.suite + " " + this.houseNum + " " + this.streetName).strip();
     }
 
     public int hashCode() {

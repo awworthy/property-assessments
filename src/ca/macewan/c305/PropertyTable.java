@@ -182,6 +182,9 @@ public class PropertyTable extends Application {
 
         HBox hBox = new HBox(10);
 
+        TextArea statsText = new TextArea(propertyAssessments.toString());
+        statsText.setMaxWidth(200);
+
         Button searchBtn = new Button("Search");
         Button resetBtn = new Button("Reset");
         searchBtn.setOnAction(event -> {
@@ -210,6 +213,7 @@ public class PropertyTable extends Application {
             }
 
             table.setItems(properties);
+            statsText.setText(searchAssessments.toString());
 
             accountField.clear();
             addressField.clear();
@@ -220,14 +224,16 @@ public class PropertyTable extends Application {
             addressField.clear();
             neighbourhoodField.clear();
             classBox.setValue(null);
+            statsText.setText(propertyAssessments.toString());
 
             properties = FXCollections.observableArrayList(propertyAssessments.getPropertyAssessments());
             table.setItems(properties);
         });
 
+        Separator separator = new Separator();
 
         hBox.getChildren().addAll(searchBtn, resetBtn);
-        vbox.getChildren().addAll(title, accountLabel, accountField, addressLabel, addressField, neighbourhoodLabel, neighbourhoodField, assessLabel, classBox, hBox);
+        vbox.getChildren().addAll(title, accountLabel, accountField, addressLabel, addressField, neighbourhoodLabel, neighbourhoodField, assessLabel, classBox, hBox, separator, statsText);
         return vbox;
     }
 }
