@@ -71,10 +71,8 @@ public class PropertyTable extends Application {
         final Label searchLabel =  new Label("Find Property Assessment");
         tableLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
 
-        //hBox.getChildren().addAll(firstNameField, lastNameField, taxField, addBtn);
         tableBox.setVgrow(table, Priority.ALWAYS);
-        tableBox.getChildren().addAll(tableLabel, table /* hBox */ );
-        //tableBox.getChildren().addAll(searchLabel, searchfield1);
+        tableBox.getChildren().addAll(tableLabel, table);
         primaryStage.show();
     }
 
