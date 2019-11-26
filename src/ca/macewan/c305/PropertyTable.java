@@ -62,13 +62,14 @@ public class PropertyTable extends Application {
 
         TabPane tabPane = new TabPane();
         Tab tab1 = new Tab("Assessments");
-        Tab tab2 = new Tab("Tab 2");
+        Tab tab2 = new Tab("Map");
         Tab tab3 = new Tab("Tab 3");
         tab1.setClosable(false);
         tab2.setClosable(false);
         tab3.setClosable(false);
         tabPane.getTabs().addAll(tab1, tab2, tab3);
         tab1.setContent(borderPane);
+        tab2.setContent(MapTab.start());
 
         Scene scene = new Scene(tabPane, 1200, 600);
         primaryStage.setScene(scene);
