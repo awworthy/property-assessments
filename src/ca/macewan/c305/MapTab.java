@@ -2,14 +2,18 @@ package ca.macewan.c305;
 
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
+
+import java.net.URL;
 
 public class MapTab {
 
-    public static BorderPane start(){
+    public BorderPane start(){
 
         BorderPane borderPane = new BorderPane();
         borderPane.setPadding(new Insets(5));
@@ -24,19 +28,30 @@ public class MapTab {
         return borderPane;
     }
 
-    private static VBox createSearch(){
+    private VBox createSearch(){
         VBox vbox = new VBox();
-        final Label searchLabel =  new Label("Find Property Assessment");
+        final Label searchLabel =  new Label("Map Options");
         searchLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
+        vbox.setPadding(new Insets(10,10,10,10));
+        vbox.setBorder(new Border(new BorderStroke(Color.SILVER,
+                BorderStrokeStyle.SOLID, new CornerRadii(4), BorderWidths.DEFAULT)));
         vbox.getChildren().addAll(searchLabel);
         return vbox;
     }
 
-    private static VBox createMap(){
+    private VBox createMap(){
         VBox vbox = new VBox();
-        final Label mapLabel = new Label("Edmonton Property Assessments");
-        mapLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
-        vbox.getChildren().addAll(mapLabel);
+        vbox.setPadding(new Insets(10,10,10,10));
+
+
+
+        WebView webView = new WebView();
+        WebEngine webEngine = webView.getEngine();
+        URL mapUrl = getClass().getResource("Map.html");
+        webEngine.load(mapUrl.toExternalForm());
+        // add webView to the scene
+
+        vbox.getChildren().addAll(webView);
         return vbox;
     }
 
