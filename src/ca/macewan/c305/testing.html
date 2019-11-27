@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<div id="arrayContents"></div>
+<iframe width="600" height="450" frameborder="0" style="border:0" src="https://www.google.com/maps/embed/v1/place?q=edmonton&key=AIzaSyCol7KatBs7Sk73ssvgTv1mne5kL6EAY7M" allowfullscreen></iframe>
+
+
+<script>
+    function loadHeatMap(properties){
+        for (var i = 0; i < properties.length; i++){
+            document.getElementById('arrayContents').innerHTML += '<br/>'+ properties[i];
+        }
+    }
+
+</script>
+
+</body>
+</html>
