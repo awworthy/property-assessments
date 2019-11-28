@@ -16,7 +16,7 @@
 </head>
 <body>
 
-<div id="testing">asd</div>
+<div id="testing"></div>
 <div id="map"></div>
 
 
@@ -27,14 +27,14 @@
     function initMap() {
         var initPoint = [new google.maps.LatLng(53.476383340913, -113.486365191502)];
         heatmapData = new google.maps.MVCArray(initPoint);
-        document.getElementById('testing').innerText += typeof heatmapData;
-
+        heatmapData.clear();
 
         map = new google.maps.Map(
             document.getElementById('map'), {
                 zoom: 11,
                 disableDefaultUI:true,
                 center: new google.maps.LatLng(53.5461,-113.4938),
+                //Javascript map styling from https://developers.google.com/maps/documentation/javascript/styling
                 styles: [
                     {elementType: 'geometry', stylers: [{color: '#242f3e'}]},
                     {elementType: 'labels.text.stroke', stylers: [{color: '#242f3e'}]},
@@ -115,15 +115,15 @@
                         stylers: [{color: '#17263c'}]
                     }
                 ]
-
-
             });
 
+       //settings for the heatmap
         heatmap = new google.maps.visualization.HeatmapLayer({
             data: heatmapData,
             map: map
         });
 
+        //heatmap gradient
         var gradient = [
             'rgba(0, 255, 255, 0)',
             'rgba(0, 255, 255, 1)',
@@ -141,44 +141,29 @@
             'rgba(255, 0, 0, 1)'
         ];
         heatmap.set('gradient', gradient);
-
-
     }
-    function addProperties() {
-        var data = [
-            new google.maps.LatLng(53.476383340913, -113.486365191502),
-            new google.maps.LatLng(53.540771906982826, -113.5321360279101),
-            new google.maps.LatLng(53.588228552539405, -113.44085192604268)
-        ];
-        for (d in data) {
-            heatmapData.push(data[d]);
-            document.getElementById('testing').innerText += '<br/>' + data[d];
+
+    //Adds a data point to the map with a weight corresponding to the property value
+    function addProperties(properties){
+        var latLng, value, weightedLocation;
+        heatmapData.push(weightedLocation);
+        for (p in properties) {
+            latLng = new google.maps.LatLng(properties[p][0],properties[p][1]);
+            value = properties[p][2];
+            weightedLocation = {
+                location: latLng,
+                weight: value
+            };
+            heatmapData.push(weightedLocation);
         }
     }
-        function addProperty(property){
-            //var latLng = new google.maps.LatLng(property[0],property[1]);
-        //heatmapData.push(latLng);
 
-        document.getElementById('testing').innerText += "hey";
+    //Displays the size in a div at the top of the document, used for testing
+    function displaySize(){
+        document.getElementById('testing').innerText += " SIZE: " + heatmapData.getLength();
 
     }
 </script>
-<!--Load the API from the specified URL
-* The async attribute allows the browser to render the page while the API loads
-* The key parameter will contain your own API key (which is not needed for this tutorial)
-* The callback parameter executes the initMap() function
--->
-<script async defer
-
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCol7KatBs7Sk73ssvgTv1mne5kL6EAY7M&libraries=visualization&callback=initMap">
-
-
-</script>
-
-
-
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCol7KatBs7Sk73ssvgTv1mne5kL6EAY7M&libraries=visualization&callback=initMap"></script>
 </body>
-
-
-
 </html>

@@ -11,12 +11,10 @@
 
 
 <script>
-    function loadHeatMap(properties){
-        //for (var i = 0; i < properties.length; i++){
-         //   document.getElementById('arrayContents').innerHTML += '<br/>'+ properties[i];
-        //}
-
-        document.getElementById('arrayContents').innerText = properties;
+    function addProperties(properties){
+        for( p in properties){
+            document.getElementById('arrayContents').innerHTML += "\t\t" + properties [p];
+        }
     }
 
 </script>
