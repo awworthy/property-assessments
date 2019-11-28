@@ -20,8 +20,9 @@ public class MapTab {
 
     WebView webView = new WebView();
     WebEngine webEngine = webView.getEngine();
-    public BorderPane start(){
-
+    PropertyAssessments propertyAssessments;
+    public BorderPane start(PropertyAssessments propertyAssessments){
+        this.propertyAssessments = propertyAssessments;
         BorderPane borderPane = new BorderPane();
         borderPane.setPadding(new Insets(5));
 
@@ -49,13 +50,9 @@ public class MapTab {
             @Override
             public void handle(ActionEvent actionEvent) {
                 if(webEngine != null) {
-                    List<String> properties = new ArrayList<String>();
-                    properties.add("123,-134");
-                    properties.add("123423,-9134");
-                    properties.add("15523,-1374");
-
-                    System.out.println(formatJS(properties));
-                    webEngine.executeScript("loadHeatMap(" + formatJS(properties)+")");
+                    //formatJS();
+                    webEngine.executeScript("addProperties()");
+                    //webEngine.executeScript("initMap(" + formatJS()+")");
                 }
 
             }
@@ -70,8 +67,8 @@ public class MapTab {
 
 
 
-        //URL mapUrl = getClass().getResource("Map.html");
-        URL mapUrl = getClass().getResource("testing.html");//used for testing so I don't use up my credits lol
+        URL mapUrl = getClass().getResource("Map.html");
+        //URL mapUrl = getClass().getResource("testing.html");//used for testing so I don't use up my credits lol
 
         webEngine.load(mapUrl.toExternalForm());
 
@@ -81,14 +78,24 @@ public class MapTab {
         return vbox;
     }
 
-    private String formatJS(List<String> properties){
+    private String formatJS(){
         StringBuilder jsArray = new StringBuilder();
         jsArray.append("[");
-        for (String property : properties){
-            jsArray.append(property+",");
+        int c = 0;
+        for (PropertyAssessment property : propertyAssessments.getPropertyAssessments()){
+            //jsArray.append("new google.maps.LatLng("+ property.getLatitude()+", "+property.getLongitude()+"),");
+            jsArray.append("\""+ property.getLatitude()+"\",\""+property.getLongitude() +"\",");
+            if(c >25000){
+
+                jsArray.append("]");
+                webEngine.executeScript("addProperty("+ jsArray +")");
+                jsArray = new StringBuilder();
+                jsArray.append("[");
+            }
+            c++;
+            System.out.println(c);
         }
 
-        jsArray.append("]");
         return jsArray.toString();
     }
 

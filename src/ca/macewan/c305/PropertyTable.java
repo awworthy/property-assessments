@@ -70,7 +70,7 @@ public class PropertyTable extends Application {
         tabPane.getTabs().addAll(tab1, tab2, tab3);
         tab1.setContent(borderPane);
         MapTab map =  new MapTab();
-        tab2.setContent(map.start());
+        tab2.setContent(map.start(propertyAssessments));
 
         Scene scene = new Scene(tabPane, 1200, 600);
         primaryStage.setScene(scene);
