@@ -7,14 +7,11 @@
 <body>
 
 <div id="arrayContents"></div>
-<iframe width="600" height="450" frameborder="0" style="border:0" src="https://www.google.com/maps/embed/v1/place?q=edmonton&key=AIzaSyCol7KatBs7Sk73ssvgTv1mne5kL6EAY7M" allowfullscreen></iframe>
 
 
 <script>
     function addProperties(properties){
-        for( p in properties){
-            document.getElementById('arrayContents').innerHTML += "\t\t" + properties [p];
-        }
+            document.getElementById('arrayContents').innerHTML += "\t\t" + properties;
     }
 
 </script>
