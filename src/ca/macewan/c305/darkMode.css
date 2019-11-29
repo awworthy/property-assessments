@@ -1,0 +1,82 @@
+/*
+Dark mode styling for the application
+
+
+Based on material design dark theme:
+https://material.io/design/color/dark-theme
+ */
+
+.root{
+    -fx-background-color: #000;
+
+}
+
+.label, .text-area{
+    -fx-text-fill: #fff;
+}
+
+.sidebar{
+    -fx-background-color: #1d1d1d;
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+    -fx-border-color: #383838;
+    -fx-border-width: 1px;
+}
+
+.table-view{
+    -fx-text-fill: #fff;
+    -fx-background-color: #363640;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+}
+
+.table-view .cell{
+    -fx-background-color: #1d1d1d;
+    -fx-border-width: 0px;
+    -fx-text-fill: #fff;
+}
+
+.table-view .column-header,
+.table-view .column-header-background .filler {
+    -fx-background-color:  #3E50B4;
+    -fx-border-width: 0px;
+
+}
+
+.tab-pane .tab-header-background{
+    -fx-background-color: #1f1f1f;
+}
+
+.tab, .tab:selected{
+    -fx-tab-border-color: #3E50B4;
+    -fx-background-color: #3E50B4;
+}
+
+
+.tab .tab-label{
+    -fx-text-fill: #fff;
+
+}
+
+.text-area, .text-field, .combo-box, .combo-box .cell:selected{
+    -fx-background-color: #363640;
+    -fx-control-inner-background: #363640;
+    -fx-text-fill: #fff;
+    -fx-min-width: 225px;
+}
+
+.button{
+    -fx-background-color: #3E50B4;
+    -fx-text-fill: #fff;
+
+}
+
+/*
+Scrollbars
+ */
+.scroll-bar .track-background {
+    -fx-background-color: #000;
+}
+.scroll-bar .thumb{
+    -fx-background-color: #373737;
+}

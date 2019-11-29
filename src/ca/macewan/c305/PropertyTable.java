@@ -60,6 +60,7 @@ public class PropertyTable extends Application {
 
         VBox tableBox = new VBox(10);
         VBox searchBox = addVBox();
+
         tableBox.setPadding(new Insets(10, 10, 10, 10));
         searchBox.setPadding(new Insets(10,10,10,10));
         BorderPane borderPane = new BorderPane();
@@ -82,6 +83,8 @@ public class PropertyTable extends Application {
         tab2.setContent(map.start(propertyAssessments));
 
         Scene scene = new Scene(tabPane, 1200, 600);
+        String darkMode = getClass().getResource("./darkMode.css").toExternalForm();
+        scene.getStylesheets().add(darkMode);
         primaryStage.setScene(scene);
 
         final Label tableLabel = new Label("Edmonton Property Assessments");
@@ -188,7 +191,7 @@ public class PropertyTable extends Application {
         vbox.setPadding(new Insets(12,10,10,10));
         vbox.setSpacing(10);
 
-        Text title = new Text("Find Property Search");
+        final Label title = new Label("Find Property Search");
         title.setFont(Font.font("Arial", FontWeight.BOLD, 16));
 
         final Label accountLabel = new Label("Account Number:");
