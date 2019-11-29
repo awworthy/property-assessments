@@ -2,6 +2,7 @@ package ca.macewan.c305;
 
 import javafx.beans.property.Property;
 
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -172,7 +173,7 @@ public class PropertyAssessments {
         return this.length;
     }
 
-    public PropertyAssessment parseLineToAssessment(String line) {
+    public PropertyAssessment parseLineToAssessment(String line) throws NumberFormatException {
         String[] tokens = line.split(",");
 
         // get account number
