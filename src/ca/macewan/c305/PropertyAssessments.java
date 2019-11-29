@@ -1,6 +1,8 @@
 package ca.macewan.c305;
 
 import javafx.beans.property.Property;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 import java.io.IOException;
 import java.util.*;
@@ -25,6 +27,13 @@ public class PropertyAssessments {
     private boolean sorted = true;
     private Set<String> assessClassSet = new HashSet<>();
 
+    //shea addition
+    private Set<String> neighborhoodSet = new TreeSet<>();
+    private Set<String> wardSet = new TreeSet<>();
+//    private Location centre = new Location(0.0, 0.0);
+//    private Location maxNWLocation = new Location (0.0, 0.0);
+//    private Location minSELocation = new Location (0.0, 0.0);
+
     public PropertyAssessments() {
         // The Collection is constructed with length 0
         this.length = 0;
@@ -34,6 +43,10 @@ public class PropertyAssessments {
         return this.propertyAssessmentsList;
     }
 
+//    public Location getCentre() {
+//        return this.centre;
+//    }
+
     public void addPropertyAssessment(PropertyAssessment propertyAssessment) {
         // Adds a property assessment to the collection
         propertyAssessmentsList.add(propertyAssessment);
@@ -41,6 +54,29 @@ public class PropertyAssessments {
         this.sorted = false;    // Keep track of whether the list has been sorted since something was added
                                 // so that sorting isn't done on an already sorted list
         this.assessClassSet.add(propertyAssessment.getClassification());
+
+        //shea addition
+        this.neighborhoodSet.add(propertyAssessment.getNeighbourhood().getNeighbourhood());
+        this.wardSet.add(propertyAssessment.getNeighbourhood().getWard());
+    }
+
+    //shea addition
+    public PropertyAssessments getAssessmentsByWard(String ward) {
+        // Returns neighbourhood-specific collection of property assessments
+        PropertyAssessments wardAssessments = new PropertyAssessments();
+
+        for (PropertyAssessment propertyAssessment : this.propertyAssessmentsList) {
+            // Compare each assessment's neighbourhood with the search word
+            String thisWard = propertyAssessment.getNeighbourhood().getWard().toUpperCase();
+            //String thisNeighbourhood = nbhood.getNeighbourhood();
+
+            if (thisWard.startsWith(ward.toUpperCase())) {
+                // Add a valid property assessment to the new collection
+                wardAssessments.addPropertyAssessment(propertyAssessment);
+            }
+
+        }
+        return wardAssessments;
     }
 
     public PropertyAssessments getAssessmentsByNeighbourhood(String neighbourhood) {
@@ -78,6 +114,60 @@ public class PropertyAssessments {
         return this.assessClassSet;
     }
 
+    //shea add
+    public Set<String> getNeighborhoodSet() {
+        return this.neighborhoodSet;
+    }
+
+    //shea add
+    public Set<String> getWardSet() {return this.wardSet;}
+
+    //shea add
+    public String[] getSortedWardList() {
+        Set<String> wardSetCopy = getWardSet();
+        Set<Integer> toConvert = new TreeSet<>();
+        Iterator itr = wardSetCopy.iterator();
+        itr.next();
+        //Convert string set to integer set for sorting
+        while(itr.hasNext()) {
+            String s = (String) itr.next();
+            String[] arr = s.split(" ");
+            toConvert.add(Integer.parseInt(arr[1]));
+        }
+        //convert to sorted string array
+        itr = toConvert.iterator();
+        String[] toRet = new String[toConvert.size()];
+        for(int i = 0; i < toRet.length; i++) {
+            toRet[i] = "Ward " + itr.next();
+        }
+        return toRet;
+    }
+
+    //shea add
+
+    public Location getCentre() {
+        Double minLatitude = 90.0;
+        Double maxLatitude = -90.0;
+        Double minLongitude = 180.0;
+        Double maxLongitude = -180.0;
+        for (PropertyAssessment p : this.getPropertyAssessments()) {
+            if (p.getLatitude() > maxLatitude) {
+                maxLatitude = p.getLatitude();
+            }
+            if (p.getLatitude() < minLatitude) {
+                minLatitude = p.getLatitude();
+            }
+            if (p.getLongitude() > maxLongitude) {
+                maxLongitude = p.getLongitude();
+            }
+            if (p.getLongitude() < minLongitude) {
+                minLongitude = p.getLongitude();
+            }
+        }
+//        this.maxNWLocation = new Location
+        return new Location((maxLatitude + minLatitude) / 2, (maxLongitude + minLongitude) / 2);
+    }
+
     public PropertyAssessments getAssessmentsByClass(String classInput) {
         PropertyAssessments classAssessments = new PropertyAssessments();
 
@@ -88,7 +178,6 @@ public class PropertyAssessments {
                 classAssessments.addPropertyAssessment(propertyAssessment);
             }
         }
-
         return classAssessments;
     }
 
