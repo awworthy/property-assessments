@@ -69,7 +69,8 @@ public class PropertyTable extends Application {
         tab3.setClosable(false);
         tabPane.getTabs().addAll(tab1, tab2, tab3);
         tab1.setContent(borderPane);
-        tab2.setContent(MapTab.start());
+        MapTab map =  new MapTab();
+        tab2.setContent(map.start(propertyAssessments));
 
         Scene scene = new Scene(tabPane, 1200, 600);
         primaryStage.setScene(scene);
@@ -92,6 +93,7 @@ public class PropertyTable extends Application {
 
     private void configureTable() {
         table = new TableView<>();
+
 
         properties = FXCollections.observableArrayList(propertyAssessments.getPropertyAssessments());
         table.setItems(properties);
