@@ -141,7 +141,7 @@ public class PropertyAssessments {
         sortAssessments();
         if (this.length % 2 == 0){
             long avg = (this.propertyAssessmentsList.get(this.length/2)).getValue() +
-                    (this.propertyAssessmentsList.get(this.length/2+1)).getValue();
+                    (this.propertyAssessmentsList.get(this.length/2-1)).getValue();
             return avg/2;
         }
         return (this.propertyAssessmentsList.get(this.length/2)).getValue();

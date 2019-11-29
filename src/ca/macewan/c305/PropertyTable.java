@@ -14,8 +14,11 @@ package ca.macewan.c305;
  */
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -25,8 +28,11 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.text.NumberFormat;
@@ -39,6 +45,8 @@ public class PropertyTable extends Application {
     private ObservableList<PropertyAssessment> properties;
     private PropertyAssessments propertyAssessments;
     private String filename = "Property_Assessment_Data__Current_Calendar_Year_.csv";
+    private TextArea statsText;
+    Stage stage;
 
     public static void main(String[] args) {
         launch(args);
@@ -46,6 +54,7 @@ public class PropertyTable extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+        this.stage = primaryStage;
         primaryStage.setTitle("Property Assessments");
         propertyAssessments = makePropertyAssessments(filename);
 
@@ -69,7 +78,8 @@ public class PropertyTable extends Application {
         tab3.setClosable(false);
         tabPane.getTabs().addAll(tab1, tab2, tab3);
         tab1.setContent(borderPane);
-        tab2.setContent(MapTab.start());
+        MapTab map =  new MapTab();
+        tab2.setContent(map.start(propertyAssessments));
 
         Scene scene = new Scene(tabPane, 1200, 600);
         primaryStage.setScene(scene);
@@ -79,7 +89,6 @@ public class PropertyTable extends Application {
 
         configureTable();
 
-
         final Label searchLabel =  new Label("Find Property Assessment");
         tableLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
 
@@ -87,11 +96,13 @@ public class PropertyTable extends Application {
         tableBox.setVgrow(table, Priority.ALWAYS);
         tableBox.getChildren().addAll(tableLabel, table /* hBox */ );
         //tableBox.getChildren().addAll(searchLabel, searchfield1);
+
         primaryStage.show();
     }
 
     private void configureTable() {
         table = new TableView<>();
+
 
         properties = FXCollections.observableArrayList(propertyAssessments.getPropertyAssessments());
         table.setItems(properties);
@@ -136,7 +147,7 @@ public class PropertyTable extends Application {
         table.getColumns().setAll(acctNumCol, addressCol, assessedValCol, classCol, nbhoodCol, latCol, longCol);
     }
 
-    private static PropertyAssessments makePropertyAssessments(String filename) throws IOException {
+    private static PropertyAssessments makePropertyAssessments(String filename) throws IOException, NumberFormatException {
         Scanner file = new Scanner(Paths.get(filename));
         int n = getLength(file);
 
@@ -194,7 +205,8 @@ public class PropertyTable extends Application {
 
         HBox hBox = new HBox(10);
 
-        TextArea statsText = new TextArea(propertyAssessments.toString());
+        statsText = new TextArea();
+        statsText.setText(propertyAssessments.toString());
         statsText.setMaxWidth(200);
 
         Button searchBtn = new Button("Search");
@@ -244,8 +256,52 @@ public class PropertyTable extends Application {
 
         Separator separator = new Separator();
 
+        /* File open button in the following hBox */
+        HBox fileBox = makeFileBox();
+
         hBox.getChildren().addAll(searchBtn, resetBtn);
-        vbox.getChildren().addAll(title, accountLabel, accountField, addressLabel, addressField, neighbourhoodLabel, neighbourhoodField, assessLabel, classBox, hBox, separator, statsText);
+        vbox.getChildren().addAll(title, accountLabel, accountField, addressLabel, addressField, neighbourhoodLabel, neighbourhoodField, assessLabel, classBox, hBox, separator, statsText, fileBox);
         return vbox;
+    }
+
+    /**
+     * makeFileBox()
+     *      Creates a new hBox containing a button. The button allows a user to bring up a file explorer window
+     *      and select a custom .csv file for opening.
+     * @return HBox
+     */
+    private HBox makeFileBox() {
+        FileChooser fileChooser = new FileChooser();
+        final Button openFileButton = new Button("Choose custom file");
+        HBox hBox = new HBox(10);
+        openFileButton.setOnAction(
+                e -> {
+                    // let the user choose the file, get the file path.
+                    File file = fileChooser.showOpenDialog(stage);
+                    filename = file.getPath();
+                    try {
+                        // update the main propertyAssessments collection class
+                        propertyAssessments = makePropertyAssessments(filename);
+                        
+                        // reset the table
+                        table.setItems(properties);
+
+                        // reset the stats box on the left border
+                        statsText.setText(propertyAssessments.toString());
+                    } catch (Exception ex) {
+                        //ex.printStackTrace();
+                        String err = "The file " + file.getName() + " does not contain property assessment data in a readable format";
+                        System.out.println(err);
+
+                        // Display alert dialog if something went wrong in opening the file
+                        Alert dialog = new Alert(Alert.AlertType.ERROR, err, ButtonType.OK);
+                        dialog.setHeaderText("Error: File Not Readable");
+                        dialog.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+                        dialog.show();
+                    }
+                });
+        hBox.getChildren().addAll(openFileButton);
+
+        return hBox;
     }
 }
