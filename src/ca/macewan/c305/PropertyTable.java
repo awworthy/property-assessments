@@ -89,7 +89,6 @@ public class PropertyTable extends Application {
 
         configureTable();
 
-
         final Label searchLabel =  new Label("Find Property Assessment");
         tableLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
 
@@ -265,22 +264,36 @@ public class PropertyTable extends Application {
         return vbox;
     }
 
+    /**
+     * makeFileBox()
+     *      Creates a new hBox containing a button. The button allows a user to bring up a file explorer window
+     *      and select a custom .csv file for opening.
+     * @return HBox
+     */
     private HBox makeFileBox() {
         FileChooser fileChooser = new FileChooser();
         final Button openFileButton = new Button("Choose custom file");
         HBox hBox = new HBox(10);
         openFileButton.setOnAction(
                 e -> {
+                    // let the user choose the file, get the file path.
                     File file = fileChooser.showOpenDialog(stage);
                     filename = file.getPath();
                     try {
+                        // update the main propertyAssessments collection class
                         propertyAssessments = makePropertyAssessments(filename);
+                        
+                        // reset the table
                         table.setItems(properties);
+
+                        // reset the stats box on the left border
                         statsText.setText(propertyAssessments.toString());
                     } catch (Exception ex) {
                         //ex.printStackTrace();
                         String err = "The file " + file.getName() + " does not contain property assessment data in a readable format";
                         System.out.println(err);
+
+                        // Display alert dialog if something went wrong in opening the file
                         Alert dialog = new Alert(Alert.AlertType.ERROR, err, ButtonType.OK);
                         dialog.setHeaderText("Error: File Not Readable");
                         dialog.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
