@@ -283,7 +283,8 @@ public class PropertyTable extends Application {
                 e -> {
                     // let the user choose the file, get the file path.
                     File file = fileChooser.showOpenDialog(stage);
-                    filename = file.getPath();
+                    if (file != null)
+                        filename = file.getPath();
                     try {
                         // update the main propertyAssessments collection class
                         propertyAssessments = makePropertyAssessments(filename);
@@ -299,10 +300,7 @@ public class PropertyTable extends Application {
                         System.out.println(err);
 
                         // Display alert dialog if something went wrong in opening the file
-                        Alert dialog = new Alert(Alert.AlertType.ERROR, err, ButtonType.OK);
-                        dialog.setHeaderText("Error: File Not Readable");
-                        dialog.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
-                        dialog.show();
+                        PopUp.Error(err);
                     }
                 });
         hBox.getChildren().addAll(openFileButton);
