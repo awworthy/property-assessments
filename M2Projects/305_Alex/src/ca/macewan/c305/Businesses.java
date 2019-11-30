@@ -128,7 +128,7 @@ public class Businesses {
         if(addressArray.length == 2) {
             return new Address(null, addressArray[0], addressArray[1]);
         }
-        if(addressArray.length == 1) {
+        if(addressArray.length == 3) {
             return new Address(addressArray[0], addressArray[1], addressArray[2]);
         }
         return null;
