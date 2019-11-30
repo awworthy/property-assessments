@@ -283,7 +283,8 @@ public class PropertyTable extends Application {
                 e -> {
                     // let the user choose the file, get the file path.
                     File file = fileChooser.showOpenDialog(stage);
-                    filename = file.getPath();
+                    if (file != null)
+                        filename = file.getPath();
                     try {
                         // update the main propertyAssessments collection class
                         propertyAssessments = makePropertyAssessments(filename);
