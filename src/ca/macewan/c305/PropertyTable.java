@@ -80,8 +80,8 @@ public class PropertyTable extends Application {
         tab1.setContent(borderPane);
         MapTab map =  new MapTab();
         tab2.setContent(map.start(propertyAssessments));
-        Tab3 map2 = new Tab3();
-        tab3.setContent(map2.start(propertyAssessments));
+//        Tab3 map2 = new Tab3();
+//        tab3.setContent(map2.start(propertyAssessments));
 
         Scene scene = new Scene(tabPane, 1200, 600);
         primaryStage.setScene(scene);
