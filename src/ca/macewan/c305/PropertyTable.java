@@ -62,6 +62,7 @@ public class PropertyTable extends Application {
 
         VBox tableBox = new VBox(10);
         VBox searchBox = addVBox();
+
         tableBox.setPadding(new Insets(10, 10, 10, 10));
         searchBox.setPadding(new Insets(10,10,10,10));
         BorderPane borderPane = new BorderPane();
@@ -86,6 +87,8 @@ public class PropertyTable extends Application {
 //        tab3.setContent(map2.start(propertyAssessments));
 
         Scene scene = new Scene(tabPane, 1200, 600);
+        String darkMode = getClass().getResource("./darkMode.css").toExternalForm();
+        scene.getStylesheets().add(darkMode);
         primaryStage.setScene(scene);
 
         final Label tableLabel = new Label("Edmonton Property Assessments");
@@ -192,7 +195,7 @@ public class PropertyTable extends Application {
         vbox.setPadding(new Insets(12,10,10,10));
         vbox.setSpacing(10);
 
-        Text title = new Text("Find Property Search");
+        final Label title = new Label("Find Property Search");
         title.setFont(Font.font("Arial", FontWeight.BOLD, 16));
 
         final Label accountLabel = new Label("Account Number:");
@@ -282,7 +285,8 @@ public class PropertyTable extends Application {
                 e -> {
                     // let the user choose the file, get the file path.
                     File file = fileChooser.showOpenDialog(stage);
-                    filename = file.getPath();
+                    if (file != null)
+                        filename = file.getPath();
                     try {
                         // update the main propertyAssessments collection class
                         propertyAssessments = makePropertyAssessments(filename);
@@ -298,10 +302,7 @@ public class PropertyTable extends Application {
                         System.out.println(err);
 
                         // Display alert dialog if something went wrong in opening the file
-                        Alert dialog = new Alert(Alert.AlertType.ERROR, err, ButtonType.OK);
-                        dialog.setHeaderText("Error: File Not Readable");
-                        dialog.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
-                        dialog.show();
+                        PopUp.Error(err);
                     }
                 });
         hBox.getChildren().addAll(openFileButton);
