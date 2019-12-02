@@ -172,6 +172,11 @@
     function clearMap(){
         heatmapData.clear();
     }
+    //shea addition
+    function setCentreAndZoom(latitude, longitude, zoom){
+        map.setCenter({lat:latitude, lng:longitude});
+        map.setZoom(zoom);
+    }
 
 </script>
 <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCol7KatBs7Sk73ssvgTv1mne5kL6EAY7M&libraries=visualization&callback=initMap"></script>
