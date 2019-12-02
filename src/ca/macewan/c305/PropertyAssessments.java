@@ -30,9 +30,6 @@ public class PropertyAssessments {
     //shea addition
     private Set<String> neighborhoodSet = new TreeSet<>();
     private Set<String> wardSet = new TreeSet<>();
-//    private Location centre = new Location(0.0, 0.0);
-//    private Location maxNWLocation = new Location (0.0, 0.0);
-//    private Location minSELocation = new Location (0.0, 0.0);
 
     public PropertyAssessments() {
         // The Collection is constructed with length 0

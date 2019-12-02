@@ -16,8 +16,10 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 
+import java.io.IOException;
 import java.net.URL;
-import java.util.Set;
+import java.nio.file.Paths;
+import java.util.*;
 
 /**
  * Map class handles the functions related to the Map tab in the property assessments program
@@ -35,7 +37,7 @@ public class MapTab {
      * @param propertyAssessments
      * @return borderPane that contains all the content for the map tab
      */
-    public BorderPane start(PropertyAssessments propertyAssessments){
+    public BorderPane start(PropertyAssessments propertyAssessments) throws IOException {
         this.propertyAssessments = propertyAssessments;
         BorderPane borderPane = new BorderPane();
         borderPane.setPadding(new Insets(5));
@@ -54,15 +56,18 @@ public class MapTab {
      *
      * @return The side options panel for controlling the map
      */
-    private VBox createSearch(){
+    private VBox createSearch() throws IOException {
         VBox vbox = new VBox();
-        vbox.setSpacing(10);
         final Label searchLabel =  new Label("Map Options");
         searchLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
         TextArea textArea = new TextArea();
         textArea.setMaxWidth(200);
 
         //shea addition
+        Map<String, List<Location>> neighborhoodBounds = getCoordinates("Neighbourhood_20Boundaries_20_Tableau_.csv");
+        //for testing
+//        Map<String, List<Location>> neighborhoodBounds = getCoordinates("nBounds.csv");
+        Map<String, List<Location>> wardBounds = getCoordinates("Municipal_20Ward_20Boundaries_20_Tableau_.csv");
         final Label neighbourhoodLabel = new Label("Search for neighbourhood");
         Set<String> neighbourhoodSet = propertyAssessments.getNeighborhoodSet();
         ObservableList<String> options = FXCollections.observableArrayList(neighbourhoodSet);
@@ -87,12 +92,14 @@ public class MapTab {
             @Override
             public void handle(ActionEvent actionEvent) {
                 if (neighbourhoodBox.getValue() != null) {
-                    PropertyAssessments neighborhood = propertyAssessments.getAssessmentsByNeighbourhood((String) neighbourhoodBox.getValue());
+                    String neighborhoodName = (String)neighbourhoodBox.getValue();
+                    PropertyAssessments neighborhood = propertyAssessments.getAssessmentsByNeighbourhood(neighborhoodName);
                     Location centre = neighborhood.getCentre();
+                    List<Location> neighborhoodCoordinates =  neighborhoodBounds.get(neighborhoodName);
                     if (webEngine != null) {
-                        jsResetMap(centre, 15);
+                        jsGoMap(centre, 15, neighborhoodCoordinates);
                     }
-                    textArea.setText(neighbourhoodBox.getValue().toString() + "\n" + neighborhood.toString());
+                    textArea.setText(neighborhoodName + "\n" + neighborhood.toString());
                     neighbourhoodBox.setValue(null);
                     wardBox.setValue(null);
                 }
@@ -103,12 +110,14 @@ public class MapTab {
             @Override
             public void handle(ActionEvent actionEvent) {
                 if (wardBox.getValue() != null) {
-                    PropertyAssessments ward = propertyAssessments.getAssessmentsByWard((String) wardBox.getValue());
+                    String wardName = (String)wardBox.getValue();
+                    PropertyAssessments ward = propertyAssessments.getAssessmentsByWard(wardName);
                     Location centre = ward.getCentre();
+                    List<Location> wardCoordinates = wardBounds.get(wardName);
                     if (webEngine != null) {
-                        jsResetMap(centre, 12);
+                        jsGoMap(centre, 12, wardCoordinates);
                     }
-                    textArea.setText(wardBox.getValue().toString() + "\n" + ward.toString());
+                    textArea.setText(wardName + "\n" + ward.toString());
                     neighbourhoodBox.setValue(null);
                     wardBox.setValue(null);
                 }
@@ -145,13 +154,13 @@ public class MapTab {
         VBox vbox = new VBox();
         //vbox.setPadding(new Insets(10,10,10,10));
 
-        // URL mapUrl = getClass().getResource("Map.html"); //PLEASE do not keep this enabled during dev as it will burn into my free credits
+        URL mapUrl = getClass().getResource("Map.html"); //PLEASE do not keep this enabled during dev as it will burn into my free credits
 
         /* Use below file for testing. If you want to see fancy map, uncomment the the above
          * line and comment out the below line
          * Don't forget to switch it back
          */
-        URL mapUrl = getClass().getResource("testing.html");
+        //URL mapUrl = getClass().getResource("testing.html");
 
         webEngine.load(mapUrl.toExternalForm());
 
@@ -187,9 +196,62 @@ public class MapTab {
     }
 
     //shea addition
-    private void jsResetMap(Location centre, int zoom){
+    private void jsGoMap(Location centre, int zoom, List<Location> bounds){
         StringBuilder jsArray = new StringBuilder();
         jsArray.append(centre.getLatitude() + ", " + centre.getLongitude() + ", " + zoom);
         webEngine.executeScript("setCentreAndZoom(" + jsArray.toString() + ")");
+//        StringBuilder jsArray2 = new StringBuilder();
+//        jsArray2.setLength(0);
+//        jsArray2.append("[");
+//        for (Location l: bounds) {
+//            jsArray2.append(l.getLatitude() + ", " + l.getLongitude());
+//        }
+//        jsArray2.append("]");
+//        webEngine.executeScript("drawBoundary(" + jsArray2.toString() + ")");
+    }
+
+    private static Map<String, List<Location>> getCoordinates(String filename) throws IOException, NumberFormatException {
+        Scanner file = new Scanner(Paths.get(filename));
+        int n = getLength(file);
+
+        // re-read file as scanner needs to point at beginning again
+        file = new Scanner(Paths.get(filename));
+        Map<String, List<Location>> coordinates = new HashMap<>();
+        List<Location> bounds = new ArrayList<>();
+
+        String currentLine = file.nextLine();
+        String[] lineArray = currentLine.split(",");
+        String name = lineArray[0];
+        Location coordinate = new Location(Double.parseDouble(lineArray[1]), Double.parseDouble(lineArray[2]));
+        bounds.add(coordinate);
+        for (int i = 0 ; i < n && file.hasNextLine() ; i++){
+            // iterate through each line and make a Property Assessment from each
+            currentLine = file.nextLine();
+            lineArray = currentLine.split(",");
+            if(lineArray[0].equals(name)){
+                coordinate = new Location(Double.parseDouble(lineArray[1]), Double.parseDouble(lineArray[2]));
+                bounds.add(coordinate);
+            }
+            else{
+                coordinates.put(name, bounds);
+                bounds.clear();
+                coordinate = new Location(Double.parseDouble(lineArray[1]), Double.parseDouble(lineArray[2]));
+                bounds.add(coordinate);
+                name = lineArray[0];
+            }
+        }
+        return coordinates;
+    }
+
+    private static int getLength(Scanner file){
+        int n = 0;
+        if (file.hasNextLine()) {
+            file.nextLine();
+        }
+        while (file.hasNextLine()) {
+            file.nextLine();
+            n++;
+        }
+        return n;
     }
 }
