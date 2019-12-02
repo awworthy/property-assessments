@@ -79,8 +79,8 @@ public class PropertyTable extends Application {
         tab3.setClosable(false);
         tabPane.getTabs().addAll(tab1, tab2, tab3);
         tab1.setContent(borderPane);
-        MapTab map =  new MapTab();
-        tab2.setContent(map.start(propertyAssessments));
+        //MapTab map =  new MapTab();
+        //tab2.setContent(map.start(propertyAssessments));
         Tab3 map2 = new Tab3();
         tab3.setContent(map2.start(propertyAssessments));
 
