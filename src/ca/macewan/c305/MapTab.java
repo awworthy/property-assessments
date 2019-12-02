@@ -65,6 +65,8 @@ public class MapTab {
 
         //shea addition
         Map<String, List<Location>> neighborhoodBounds = getCoordinates("Neighbourhood_20Boundaries_20_Tableau_.csv");
+        //for testing
+//        Map<String, List<Location>> neighborhoodBounds = getCoordinates("nBounds.csv");
         Map<String, List<Location>> wardBounds = getCoordinates("Municipal_20Ward_20Boundaries_20_Tableau_.csv");
         final Label neighbourhoodLabel = new Label("Search for neighbourhood");
         Set<String> neighbourhoodSet = propertyAssessments.getNeighborhoodSet();
@@ -97,7 +99,7 @@ public class MapTab {
                     if (webEngine != null) {
                         jsGoMap(centre, 15, neighborhoodCoordinates);
                     }
-                    textArea.setText(neighbourhoodBox.getValue().toString() + "\n" + neighborhood.toString());
+                    textArea.setText(neighborhoodName + "\n" + neighborhood.toString());
                     neighbourhoodBox.setValue(null);
                     wardBox.setValue(null);
                 }
@@ -115,7 +117,7 @@ public class MapTab {
                     if (webEngine != null) {
                         jsGoMap(centre, 12, wardCoordinates);
                     }
-                    textArea.setText(wardBox.getValue().toString() + "\n" + ward.toString());
+                    textArea.setText(wardName + "\n" + ward.toString());
                     neighbourhoodBox.setValue(null);
                     wardBox.setValue(null);
                 }
@@ -152,13 +154,13 @@ public class MapTab {
         VBox vbox = new VBox();
         //vbox.setPadding(new Insets(10,10,10,10));
 
-        //URL mapUrl = getClass().getResource("Map.html"); //PLEASE do not keep this enabled during dev as it will burn into my free credits
+        URL mapUrl = getClass().getResource("Map.html"); //PLEASE do not keep this enabled during dev as it will burn into my free credits
 
         /* Use below file for testing. If you want to see fancy map, uncomment the the above
          * line and comment out the below line
          * Don't forget to switch it back
          */
-        URL mapUrl = getClass().getResource("testing.html");
+        //URL mapUrl = getClass().getResource("testing.html");
 
         webEngine.load(mapUrl.toExternalForm());
 
@@ -198,14 +200,14 @@ public class MapTab {
         StringBuilder jsArray = new StringBuilder();
         jsArray.append(centre.getLatitude() + ", " + centre.getLongitude() + ", " + zoom);
         webEngine.executeScript("setCentreAndZoom(" + jsArray.toString() + ")");
-        StringBuilder jsArray2 = new StringBuilder();
-        jsArray2.setLength(0);
-        jsArray2.append("[");
-        for (Location l: bounds) {
-            jsArray2.append(l.getLatitude() + ", " + l.getLongitude());
-        }
-        jsArray2.append("]");
-        webEngine.executeScript("drawBoundary(" + jsArray2.toString() + ")");
+//        StringBuilder jsArray2 = new StringBuilder();
+//        jsArray2.setLength(0);
+//        jsArray2.append("[");
+//        for (Location l: bounds) {
+//            jsArray2.append(l.getLatitude() + ", " + l.getLongitude());
+//        }
+//        jsArray2.append("]");
+//        webEngine.executeScript("drawBoundary(" + jsArray2.toString() + ")");
     }
 
     private static Map<String, List<Location>> getCoordinates(String filename) throws IOException, NumberFormatException {
@@ -214,28 +216,28 @@ public class MapTab {
 
         // re-read file as scanner needs to point at beginning again
         file = new Scanner(Paths.get(filename));
-//        if (file.hasNextLine()) { // Skip header
-//            file.nextLine();
-//        }
         Map<String, List<Location>> coordinates = new HashMap<>();
         List<Location> bounds = new ArrayList<>();
+
         String currentLine = file.nextLine();
         String[] lineArray = currentLine.split(",");
         String name = lineArray[0];
+        Location coordinate = new Location(Double.parseDouble(lineArray[1]), Double.parseDouble(lineArray[2]));
+        bounds.add(coordinate);
         for (int i = 0 ; i < n && file.hasNextLine() ; i++){
             // iterate through each line and make a Property Assessment from each
             currentLine = file.nextLine();
             lineArray = currentLine.split(",");
             if(lineArray[0].equals(name)){
-                Location coordinate = new Location(Double.parseDouble(lineArray[1]), Double.parseDouble(lineArray[2]));
+                coordinate = new Location(Double.parseDouble(lineArray[1]), Double.parseDouble(lineArray[2]));
                 bounds.add(coordinate);
             }
             else{
-                Location coordinate = new Location(Double.parseDouble(lineArray[1]), Double.parseDouble(lineArray[2]));
-                bounds.add(coordinate);
                 coordinates.put(name, bounds);
-                name = lineArray[0];
                 bounds.clear();
+                coordinate = new Location(Double.parseDouble(lineArray[1]), Double.parseDouble(lineArray[2]));
+                bounds.add(coordinate);
+                name = lineArray[0];
             }
         }
         return coordinates;
