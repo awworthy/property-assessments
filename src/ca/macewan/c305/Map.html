@@ -21,13 +21,15 @@
 
 
 <script>
-    var map, heatmap;
+    var map, heatmap, areaBoundary;
     var heatmapData;
     // Initialize and add the map
     function initMap() {
         var initPoint = [new google.maps.LatLng(53.476383340913, -113.486365191502)];
         heatmapData = new google.maps.MVCArray(initPoint);
         heatmapData.clear();
+        areaBoundary = new google.maps.MVCArray(initPoint);
+        areaBoundary.clear();
 
         map = new google.maps.Map(
             document.getElementById('map'), {
@@ -176,6 +178,24 @@
     function setCentreAndZoom(latitude, longitude, zoom){
         map.setCenter({lat:latitude, lng:longitude});
         map.setZoom(zoom);
+    }
+
+    //Render boundary around an area
+    function drawBoundary(boundary){
+        for(var i=0, len = boundary.length, latLng; i < len; i++){
+            latLng = new google.maps.LatLng(boundary[i][0],boundary[i][1]);
+            document.getElementById('testing').innerHTML += "\n\n>>>" + boundary[i][0];
+            areaBoundary.push(latLng);
+        }
+
+        var boundaryLine = new google.maps.Polyline({
+            path: areaBoundary,
+            geodesic: true,
+            strokeColor: '#FF0000',
+            strokeOpacity: 1.0,
+            strokeWeight: 2
+        });
+        boundaryLine.setMap(map);
     }
 
 </script>

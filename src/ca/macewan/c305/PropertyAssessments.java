@@ -70,7 +70,7 @@ public class PropertyAssessments {
             String thisWard = propertyAssessment.getNeighbourhood().getWard().toUpperCase();
             //String thisNeighbourhood = nbhood.getNeighbourhood();
 
-            if (thisWard.startsWith(ward.toUpperCase())) {
+            if (thisWard.equals(ward.toUpperCase())) {
                 // Add a valid property assessment to the new collection
                 wardAssessments.addPropertyAssessment(propertyAssessment);
             }

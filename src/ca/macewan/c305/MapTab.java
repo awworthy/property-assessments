@@ -28,6 +28,7 @@ public class MapTab {
     WebView webView = new WebView();
     WebEngine webEngine = webView.getEngine();
     PropertyAssessments propertyAssessments;
+    PropertyAssessments customCollection;
 
     /**
      * Creates a new BorderPane that contains the map and a side menu of options
@@ -88,6 +89,7 @@ public class MapTab {
             public void handle(ActionEvent actionEvent) {
                 if (neighbourhoodBox.getValue() != null) {
                     PropertyAssessments neighborhood = propertyAssessments.getAssessmentsByNeighbourhood((String) neighbourhoodBox.getValue());
+                    customCollection = neighborhood;
                     Location centre = neighborhood.getCentre();
                     if (webEngine != null) {
                         jsResetMap(centre, 15);
@@ -95,6 +97,7 @@ public class MapTab {
                     textArea.setText(neighbourhoodBox.getValue().toString() + "\n" + neighborhood.toString());
                     neighbourhoodBox.setValue(null);
                     wardBox.setValue(null);
+                    webEngine.executeScript("drawBoundary([[-113.4391533570748, 53.47434024833547],[-113.43504451282261, 53.474425710282404]])");
                 }
             }
         });
@@ -104,6 +107,7 @@ public class MapTab {
             public void handle(ActionEvent actionEvent) {
                 if (wardBox.getValue() != null) {
                     PropertyAssessments ward = propertyAssessments.getAssessmentsByWard((String) wardBox.getValue());
+                    customCollection = ward;
                     Location centre = ward.getCentre();
                     if (webEngine != null) {
                         jsResetMap(centre, 12);
@@ -111,6 +115,7 @@ public class MapTab {
                     textArea.setText(wardBox.getValue().toString() + "\n" + ward.toString());
                     neighbourhoodBox.setValue(null);
                     wardBox.setValue(null);
+
                 }
             }
         });
@@ -132,7 +137,27 @@ public class MapTab {
                 }
             }
         });
-        vbox.getChildren().addAll(searchLabel, heatMapBtn, neighbourhoodLabel, hBox, wardLabel, hBox2, textArea);
+       //Clear Map Bttn
+        Button clearMapBtn = new Button();
+        clearMapBtn.setMaxWidth(150);
+        clearMapBtn.setText("Clear Heatmap");
+        clearMapBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                if(webEngine != null) {
+                    webEngine.executeScript("clearMap()");
+                }
+            }
+        });
+        vbox.getChildren().addAll(
+                searchLabel,
+                heatMapBtn,
+                neighbourhoodLabel,
+                hBox,
+                wardLabel,
+                hBox2,
+                textArea,
+                clearMapBtn);
         return vbox;
     }
 
@@ -145,13 +170,13 @@ public class MapTab {
         VBox vbox = new VBox();
         //vbox.setPadding(new Insets(10,10,10,10));
 
-        // URL mapUrl = getClass().getResource("Map.html"); //PLEASE do not keep this enabled during dev as it will burn into my free credits
+        URL mapUrl = getClass().getResource("Map.html"); //PLEASE do not keep this enabled during dev as it will burn into my free credits
 
         /* Use below file for testing. If you want to see fancy map, uncomment the the above
          * line and comment out the below line
          * Don't forget to switch it back
          */
-        URL mapUrl = getClass().getResource("testing.html");
+        //URL mapUrl = getClass().getResource("testing.html");
 
         webEngine.load(mapUrl.toExternalForm());
 
@@ -167,10 +192,17 @@ public class MapTab {
      */
     private void jsLoadProperties(){
         StringBuilder jsArray = new StringBuilder();
+        PropertyAssessments dataset;
+        if (customCollection != null){
+            dataset = customCollection;
+        }
+        else {
+            dataset = propertyAssessments;
+        }
         jsArray.append("[");
         String point = "";
         int c = 0;
-        for (PropertyAssessment property : propertyAssessments.getPropertyAssessments()){
+        for (PropertyAssessment property : dataset.getPropertyAssessments()){
             point = "["+ property.getLatitude()+", "+property.getLongitude() + "," + property.getValue() + "],";
             jsArray.append(point);
             c++;
