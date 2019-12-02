@@ -113,13 +113,9 @@ public class MapTab {
             @Override
             public void handle(ActionEvent actionEvent) {
                 if (wardBox.getValue() != null) {
-<<<<<<< HEAD
-                    PropertyAssessments ward = propertyAssessments.getAssessmentsByWard((String) wardBox.getValue());
-                    customCollection = ward;
-=======
                     String wardName = (String)wardBox.getValue();
                     PropertyAssessments ward = propertyAssessments.getAssessmentsByWard(wardName);
->>>>>>> e3385ab1e357011ea202a758a7e8a10a8e2b1e96
+                    customCollection = ward;
                     Location centre = ward.getCentre();
                     List<Location> wardCoordinates = wardBounds.get(wardName);
                     if (webEngine != null) {
