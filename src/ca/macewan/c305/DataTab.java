@@ -1,5 +1,15 @@
 package ca.macewan.c305;
 
+/**
+ *  DataTab.java
+ *
+ *  CMPT 305:
+ *      Fall 2019
+ *  Final Project
+ *      Custom Property Assessments Application
+ *  @author Alex Worthy
+ */
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -17,8 +27,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
-import javax.swing.*;
-import javax.swing.plaf.synth.SynthTextAreaUI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -47,8 +55,8 @@ public class DataTab {
         borderPane.setPadding(new Insets(10));
 
         pieData = getPieData();
-        VBox searchBox = createSearch();
-        pieGraphBox = createGraph(pieData);
+        VBox searchBox = createSideBar();
+        pieGraphBox = createPieChart(pieData);
 
         borderPane.setLeft(searchBox);
         borderPane.setCenter(pieGraphBox);
@@ -56,11 +64,19 @@ public class DataTab {
         return borderPane;
     }
 
+    /**
+     * Updates the scene's version of propertyAssessments
+     * @param propertyAssessments
+     */
     public void update(PropertyAssessments propertyAssessments) {
         this.propertyAssessments = propertyAssessments;
     }
 
-    private VBox createSearch() {
+    /**
+     * Create the left sidebar with different buttons
+     * @return VBox to be inserted to left BorderPane
+     */
+    private VBox createSideBar() {
         VBox vbox = new VBox();
         final Label graphLabel =  new Label("Visualization Style");
         graphLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
@@ -79,7 +95,7 @@ public class DataTab {
             @Override
             public void handle(ActionEvent actionEvent) {
                 pieData = getPieData();
-                pieGraphBox = createGraph(pieData);
+                pieGraphBox = createPieChart(pieData);
                 borderPane.setCenter(pieGraphBox);
             }
         });
@@ -103,6 +119,10 @@ public class DataTab {
         return vbox;
     }
 
+    /**
+     * Create Bar Graph using data from getBarData()
+     * @return VBox to be inserted into BorderPane
+     */
     private VBox createBarBox() {
         VBox vbox = new VBox();
         final Label graphLabel = new Label("Data Visualization");
@@ -126,6 +146,10 @@ public class DataTab {
         return vbox;
     }
 
+    /**
+     * Create Scatter Plot using data from getScatter()
+     * @return VBox to be inserted into BorderPane
+     */
     private VBox createScatter() {
         VBox vbox = new VBox();
         final Label graphLabel = new Label("Data Visualization");
@@ -150,7 +174,11 @@ public class DataTab {
         return vbox;
     }
 
-    private VBox createGraph(ObservableList<PieChart.Data> pieData) {
+    /**
+     * Create PieChart using data from getBarData()
+     * @return VBox to be inserted into BorderPane
+     */
+    private VBox createPieChart(ObservableList<PieChart.Data> pieData) {
         VBox vbox = new VBox();
         final Label graphLabel = new Label("Data Visualization");
         graphLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
@@ -196,6 +224,10 @@ public class DataTab {
         return vbox;
     }
 
+    /**
+     * Obtain data for Scatter Plot from propertyAssessments
+     * @return Series for the chart
+     */
     public XYChart.Series<String, Number> getScatterData()
     {
         // declare set
@@ -208,6 +240,10 @@ public class DataTab {
         return neighbourhoodData;
     }
 
+    /**
+     * Obtain data for Bar graph from propertyAssessments
+     * @return Series for the chart
+     */
     public XYChart.Series<String, Number> getBarData()
     {
         // declare set
@@ -220,6 +256,10 @@ public class DataTab {
         return wardData;
     }
 
+    /**
+     * Obtain data for pie chart from propertyAssessments
+     * @return Observable List of data for the chart
+     */
     public ObservableList<PieChart.Data> getPieData()
     {
         long max = propertyAssessments.getMax();

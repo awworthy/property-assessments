@@ -7,12 +7,12 @@ import java.util.Objects;
  *
  *  CMPT 305:
  *      Fall 2019
- *  Assignment 1:
- *      Milestone 1
- *  Name:
+ *  Final Project
+ *      Custom Property Assessments Application
+ *  Names:
  *      Alex Worthy
- *  ID:
- *      1742554
+ *      Dakota Doolaege
+ *      Shea Odland
  */
 
 public class Location {
