@@ -86,8 +86,8 @@ public class PropertyTable extends Application {
         tab1.setContent(borderPane);
         MapTab map =  new MapTab();
         tab2.setContent(map.start(propertyAssessments));
-        Tab3 map2 = new Tab3();
-        tab3.setContent(map2.start(propertyAssessments));
+        //Tab3 map2 = new Tab3();
+        //tab3.setContent(map2.start(propertyAssessments));
         DataTab vis = new DataTab();
         tab4.setContent(vis.start(propertyAssessments));
 
@@ -111,7 +111,6 @@ public class PropertyTable extends Application {
                 else{
                     scene.getStylesheets().clear();
                 switchTheme.setText("Enable Dark Mode");}
-                System.out.println(scene.getStylesheets());
             }
         });
 

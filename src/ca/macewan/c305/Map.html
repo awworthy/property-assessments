@@ -40,7 +40,7 @@
         #legend-values{
             width:70%;
             height: 100%;
-            margin-left:30%;
+            margin: 0 0 0 30%;
             background: linear-gradient(0deg,
             rgba(255, 255, 255, 0.8),
             rgba(255, 255, 255, 0.99) 80%,
@@ -62,7 +62,7 @@
 </head>
 <body>
 
-<!--<div id="testing"></div>-->
+<div id="testing"></div>
 <div id="map"></div>
 <div id="legend">
     <div id="legend-values"><p id="max">$1000</p><p id="min">$0</p> </div>
@@ -223,6 +223,7 @@
     }
     function clearMap(){
         heatmapData.clear();
+        areaBoundary.clear();
     }
     //shea addition
     function setCentreAndZoom(latitude, longitude, zoom){
@@ -232,9 +233,12 @@
 
     //Render boundary around an area
     function drawBoundary(boundary){
-        for(var i=0, len = boundary.length, latLng; i < len; i++){
+        var len = boundary.length;
+        var latLng;
+        document.getElementById('testing').innerHTML += len + "<br/>";
+        for(var i=0; i < len; i++){
             latLng = new google.maps.LatLng(boundary[i][0],boundary[i][1]);
-            document.getElementById('testing').innerHTML += "\n\n>>>" + boundary[i][0];
+            document.getElementById('testing').innerHTML += i +": \n\n>x>>>" + latLng + "<br/>";
             areaBoundary.push(latLng);
         }
 

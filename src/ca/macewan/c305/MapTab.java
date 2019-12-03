@@ -104,7 +104,6 @@ public class MapTab {
                     textArea.setText(neighborhoodName + "\n" + neighborhood.toString());
                     neighbourhoodBox.setValue(null);
                     wardBox.setValue(null);
-                    webEngine.executeScript("drawBoundary([[-113.4391533570748, 53.47434024833547],[-113.43504451282261, 53.474425710282404]])");
                 }
             }
         });
@@ -146,7 +145,7 @@ public class MapTab {
                 }
             }
         });
-       //Clear Map Bttn
+        //Clear Map Bttn
         Button clearMapBtn = new Button();
         clearMapBtn.setMaxWidth(150);
         clearMapBtn.setText("Clear Heatmap");
@@ -232,14 +231,18 @@ public class MapTab {
         StringBuilder jsArray = new StringBuilder();
         jsArray.append(centre.getLatitude() + ", " + centre.getLongitude() + ", " + zoom);
         webEngine.executeScript("setCentreAndZoom(" + jsArray.toString() + ")");
-//        StringBuilder jsArray2 = new StringBuilder();
-//        jsArray2.setLength(0);
-//        jsArray2.append("[");
-//        for (Location l: bounds) {
-//            jsArray2.append(l.getLatitude() + ", " + l.getLongitude());
-//        }
-//        jsArray2.append("]");
-//        webEngine.executeScript("drawBoundary(" + jsArray2.toString() + ")");
+        StringBuilder jsArray2 = new StringBuilder();
+        jsArray2.setLength(0);
+        jsArray2.append("[");
+        for (Location l: bounds) {
+            System.out.println(l.getLatitude() + " , " + l.getLongitude());
+            jsArray2.append("[" + l.getLatitude() + ", " + l.getLongitude() + "],");
+        }
+
+        jsArray2.deleteCharAt(jsArray2.length()-1);
+        jsArray2.append("]");
+        System.out.println(jsArray2.toString());
+        webEngine.executeScript("drawBoundary(" + jsArray2.toString() + ")");
     }
 
     private static Map<String, List<Location>> getCoordinates(String filename) throws IOException, NumberFormatException {
