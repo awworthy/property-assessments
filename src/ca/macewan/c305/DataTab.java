@@ -195,7 +195,7 @@ public class DataTab {
                 "-fx-background-radius: 6,5;" +
                 "-fx-padding: 6px;");
         final Label caption = new Label("");
-        graphLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
+        caption.setFont(Font.font("Arial", FontWeight.BOLD, 24));
 
         Tooltip container = new Tooltip();
         double tot = 0;
