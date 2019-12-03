@@ -194,8 +194,6 @@ public class DataTab {
                 "-fx-background-insets: 0,1;" +
                 "-fx-background-radius: 6,5;" +
                 "-fx-padding: 6px;");
-        final Label caption = new Label("");
-        caption.setTextFill(Color.AQUA);
         graphLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
 
         Tooltip container = new Tooltip();
@@ -209,16 +207,12 @@ public class DataTab {
             data.getNode().
                     addEventHandler(MouseEvent.MOUSE_ENTERED, e ->
                     {
-                        if (container.isShowing())
-                        {
-                            container.hide();
-                        }
                         String text = String.format("%.1f%%", 100*data.getPieValue()/total) ;
-                        caption.setText(text);
+                        container.setText(text);
                         container.show(borderPane, e.getScreenX(), e.getScreenY());
                     });
         });
-        vbox.getChildren().addAll(chart, caption);
+        vbox.getChildren().addAll(chart);
         vbox.setAlignment(Pos.CENTER);
 
         return vbox;
