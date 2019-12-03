@@ -55,7 +55,13 @@ public class MapTab {
 
         return borderPane;
     }
-
+    /**
+     * Updates the scene's version of propertyAssessments
+     * @param propertyAssessments
+     */
+    public void update(PropertyAssessments propertyAssessments) {
+        this.propertyAssessments = propertyAssessments;
+    }
     /**
      * Creates content for the side bar
      *
