@@ -32,6 +32,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -46,6 +47,8 @@ public class PropertyTable extends Application {
     private PropertyAssessments propertyAssessments;
     private String filename = "Property_Assessment_Data__Current_Calendar_Year_.csv";
     private TextArea statsText;
+
+
     Stage stage;
 
     public static void main(String[] args) {
@@ -83,18 +86,37 @@ public class PropertyTable extends Application {
         tab1.setContent(borderPane);
         MapTab map =  new MapTab();
         tab2.setContent(map.start(propertyAssessments));
-        Tab3 map2 = new Tab3();
-        tab3.setContent(map2.start(propertyAssessments));
+        //Tab3 map2 = new Tab3();
+        //tab3.setContent(map2.start(propertyAssessments));
         DataTab vis = new DataTab();
         tab4.setContent(vis.start(propertyAssessments));
 
         Scene scene = new Scene(tabPane, 1200, 600);
         String darkMode = getClass().getResource("./darkMode.css").toExternalForm();
-        scene.getStylesheets().add(darkMode);
         primaryStage.setScene(scene);
 
         final Label tableLabel = new Label("Edmonton Property Assessments");
         tableLabel.setFont(new Font("Arial", 16));
+
+        Region spacer = new Region();
+
+        Button switchTheme = new Button();
+        switchTheme.setText("Enable Dark Mode");
+        switchTheme.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                if( scene.getStylesheets().isEmpty()){
+                    scene.getStylesheets().add(darkMode);
+                switchTheme.setText("Disable Dark Mode");}
+                else{
+                    scene.getStylesheets().clear();
+                switchTheme.setText("Enable Dark Mode");}
+            }
+        });
+
+        HBox tableHeader = new HBox();
+        tableHeader.setHgrow(spacer, Priority.ALWAYS);
+        tableHeader.getChildren().addAll(tableLabel, spacer, switchTheme);
 
         configureTable();
 
@@ -103,7 +125,7 @@ public class PropertyTable extends Application {
 
         //hBox.getChildren().addAll(firstNameField, lastNameField, taxField, addBtn);
         tableBox.setVgrow(table, Priority.ALWAYS);
-        tableBox.getChildren().addAll(tableLabel, table /* hBox */ );
+        tableBox.getChildren().addAll(tableHeader, table /* hBox */ );
         //tableBox.getChildren().addAll(searchLabel, searchfield1);
 
         primaryStage.show();

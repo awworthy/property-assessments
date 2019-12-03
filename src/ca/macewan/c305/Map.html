@@ -5,11 +5,57 @@
     <style>
         #map{
             height: 100%;
+            display: block;
         }
         html, body {
             height: 100%;
             margin: 0;
             padding: 0;
+
+        }
+
+        #legend{
+            width: 100px;
+            height: 200px;
+            background: rgb(0,255,255);
+            /*background: linear-gradient(180deg, rgba(0,255,255,0) 3%, rgba(142,207,223,1) 20%, rgba(0,255,255,0.01) 100%);*/
+            background: linear-gradient(0deg,
+            rgba(0, 255, 255, 0.5),
+            rgba(0, 255, 255, 1),
+            rgba(0, 191, 255, 1),
+            rgba(0, 127, 255, 1),
+            rgba(0, 63, 255, 1),
+            rgba(0, 0, 223, 1),
+            rgba(0, 0, 159, 1),
+            rgba(0, 0, 127, 1),
+            rgba(63, 0, 91, 1),
+            rgba(127, 0, 63, 1),
+            rgba(191, 0, 31, 1),
+            rgba(191, 0, 31, 0.5));
+            position: absolute;
+            display: grid;
+            bottom: 0;
+            right: 0;
+        }
+        #legend-values{
+            width:70%;
+            height: 100%;
+            margin: 0 0 0 30%;
+            background: linear-gradient(0deg,
+            rgba(255, 255, 255, 0.8),
+            rgba(255, 255, 255, 0.99) 80%,
+            rgba(255, 255, 255, 0.8));
+        }
+        #min{
+            bottom:0;
+            position: absolute;
+            margin: 0 0 0 1px;
+        }
+        #max{
+            top: 0;
+            position: absolute;
+            margin: 0 0 0 1px;
+
         }
 
     </style>
@@ -18,16 +64,22 @@
 
 <div id="testing"></div>
 <div id="map"></div>
+<div id="legend">
+    <div id="legend-values"><p id="max">$1000</p><p id="min">$0</p> </div>
+</div>
+
 
 
 <script>
-    var map, heatmap;
+    var map, heatmap, areaBoundary;
     var heatmapData;
     // Initialize and add the map
     function initMap() {
         var initPoint = [new google.maps.LatLng(53.476383340913, -113.486365191502)];
         heatmapData = new google.maps.MVCArray(initPoint);
         heatmapData.clear();
+        areaBoundary = new google.maps.MVCArray(initPoint);
+        areaBoundary.clear();
 
         map = new google.maps.Map(
             document.getElementById('map'), {
@@ -39,6 +91,12 @@
                     {elementType: 'geometry', stylers: [{color: '#242f3e'}]},
                     {elementType: 'labels.text.stroke', stylers: [{color: '#242f3e'}]},
                     {elementType: 'labels.text.fill', stylers: [{color: '#746855'}]},
+
+                    {
+                        "featureType": "landscape",
+                        "elementType": "geometry",
+                        "stylers": [{"color": "#000000"}]
+                    },
                     {
                         featureType: 'administrative.locality',
                         elementType: 'labels.text.fill',
@@ -117,7 +175,7 @@
                 ]
             });
 
-       //settings for the heatmap
+        //settings for the heatmap
         heatmap = new google.maps.visualization.HeatmapLayer({
             data: heatmapData,
             map: map
@@ -163,11 +221,41 @@
         document.getElementById('testing').innerText += " SIZE: " + heatmapData.getLength();
 
     }
-
+    function clearMap(){
+        heatmapData.clear();
+        areaBoundary.clear();
+    }
     //shea addition
     function setCentreAndZoom(latitude, longitude, zoom){
         map.setCenter({lat:latitude, lng:longitude});
         map.setZoom(zoom);
+    }
+
+    //Render boundary around an area
+    function drawBoundary(boundary){
+        var len = boundary.length;
+        var latLng;
+        document.getElementById('testing').innerHTML += len + "<br/>";
+        for(var i=0; i < len; i++){
+            latLng = new google.maps.LatLng(boundary[i][0],boundary[i][1]);
+            document.getElementById('testing').innerHTML += i +": \n\n>x>>>" + latLng + "<br/>";
+            areaBoundary.push(latLng);
+        }
+
+        var boundaryLine = new google.maps.Polyline({
+            path: areaBoundary,
+            geodesic: true,
+            strokeColor: '#FF0000',
+            strokeOpacity: 1.0,
+            strokeWeight: 2
+        });
+        boundaryLine.setMap(map);
+    }
+    //Update the legend range
+    function legend(max, min){
+        document.getElementById('max').innerHTML = max;
+        document.getElementById('min').innerHTML = min;
+
     }
 
 </script>
