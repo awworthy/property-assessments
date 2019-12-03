@@ -74,8 +74,8 @@ public class MapTab {
         //Map<String, List<Location>> neighborhoodBounds = getCoordinates("nBounds.csv");
         Map<String, List<Location>> wardBounds = getCoordinates("Municipal_20Ward_20Boundaries_20_Tableau_.csv");
         //Map<String, List<Location>> wardBounds = getCoordinates("wBound.csv");
-        final Label neighbourhoodLabel = new Label("Search for neighbourhood");
 
+        final Label neighbourhoodLabel = new Label("Select neighbourhood");
         Set<String> neighbourhoodSet = propertyAssessments.getNeighborhoodSet();
         ObservableList<String> options = FXCollections.observableArrayList(neighbourhoodSet);
         final ComboBox neighbourhoodBox = new ComboBox(options);
@@ -120,10 +120,10 @@ public class MapTab {
             public void handle(ActionEvent actionEvent) {
                 if (wardBox.getValue() != null) {
                     String wardName = (String)wardBox.getValue();
-                    PropertyAssessments ward = propertyAssessments.getAssessmentsByWard(wardName);
+                    PropertyAssessments ward = propertyAssessments.getAssessmentsByWard(wardName.toUpperCase());
                     customCollection = ward;
                     Location centre = ward.getCentre();
-                    List<Location> wardCoordinates = wardBounds.get(wardName);
+                    List<Location> wardCoordinates = wardBounds.get(wardName.toUpperCase());
                     if (webEngine != null) {
                         jsGoMap(centre, 12, wardCoordinates);
                     }
