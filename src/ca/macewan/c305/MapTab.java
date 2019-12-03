@@ -154,13 +154,13 @@ public class MapTab {
         VBox vbox = new VBox();
         //vbox.setPadding(new Insets(10,10,10,10));
 
-        URL mapUrl = getClass().getResource("Map.html"); //PLEASE do not keep this enabled during dev as it will burn into my free credits
+        //URL mapUrl = getClass().getResource("Map.html"); //PLEASE do not keep this enabled during dev as it will burn into my free credits
 
         /* Use below file for testing. If you want to see fancy map, uncomment the the above
          * line and comment out the below line
          * Don't forget to switch it back
          */
-        //URL mapUrl = getClass().getResource("testing.html");
+        URL mapUrl = getClass().getResource("testing.html");
 
         webEngine.load(mapUrl.toExternalForm());
 
