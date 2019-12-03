@@ -190,11 +190,10 @@ public class DataTab {
         chart.setTitle("Property Assessments by Range of Value");
         //chart.setLabelsVisible(false);
         Node ns = chart.lookup(".chart-legend");
-        ns.setStyle("-fx-background-color: #505078, blue;" +
+        ns.setStyle("-fx-background-color: #888888, grey;" +
                 "-fx-background-insets: 0,1;" +
                 "-fx-background-radius: 6,5;" +
                 "-fx-padding: 6px;");
-        graphLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
 
         Tooltip container = new Tooltip();
         double tot = 0;
