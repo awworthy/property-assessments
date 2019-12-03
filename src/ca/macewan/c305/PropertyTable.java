@@ -89,8 +89,11 @@ public class PropertyTable extends Application {
         vis = new DataTab();
 
         Scene scene = new Scene(tabPane, 1200, 600);
-        String darkMode = getClass().getResource("./darkMode.css").toExternalForm();
         primaryStage.setScene(scene);
+
+        String darkMode = getClass().getResource("./darkMode.css").toExternalForm();
+        String lightMode = getClass().getResource("./lightMode.css").toExternalForm();
+        scene.getStylesheets().add(lightMode);
 
         final Label tableLabel = new Label("Edmonton Property Assessments");
         tableLabel.setFont(new Font("Arial", 16));
@@ -102,12 +105,14 @@ public class PropertyTable extends Application {
         switchTheme.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                if( scene.getStylesheets().isEmpty()){
+                if( scene.getStylesheets().contains(lightMode)){
+                    scene.getStylesheets().clear();
                     scene.getStylesheets().add(darkMode);
-                switchTheme.setText("Disable Dark Mode");}
+                    switchTheme.setText("Disable Dark Mode");}
                 else{
                     scene.getStylesheets().clear();
-                switchTheme.setText("Enable Dark Mode");}
+                    scene.getStylesheets().add(lightMode);
+                    switchTheme.setText("Enable Dark Mode");}
             }
         });
 
@@ -324,7 +329,7 @@ public class PropertyTable extends Application {
                     try {
                         // update the main propertyAssessments collection class
                         propertyAssessments = makePropertyAssessments(filename);
-                        
+
                         // reset the table
                         table.setItems(properties);
 
