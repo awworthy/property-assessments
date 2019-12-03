@@ -240,6 +240,7 @@ public class MapTab {
                 name = lineArray[0];
             }
         }
+        System.out.println(Arrays.asList(coordinates));
         return coordinates;
     }
 
