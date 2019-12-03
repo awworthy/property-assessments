@@ -10,11 +10,15 @@ import javafx.scene.Node;
 import javafx.scene.chart.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
+import javax.swing.*;
+import javax.swing.plaf.synth.SynthTextAreaUI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -156,13 +160,37 @@ public class DataTab {
 
         final PieChart chart = new PieChart(pieData);
         chart.setTitle("Property Assessments by Range of Value");
-        chart.setLabelsVisible(false);
+        //chart.setLabelsVisible(false);
         Node ns = chart.lookup(".chart-legend");
         ns.setStyle("-fx-background-color: #505078, blue;" +
                 "-fx-background-insets: 0,1;" +
                 "-fx-background-radius: 6,5;" +
                 "-fx-padding: 6px;");
-        vbox.getChildren().add(chart);
+        final Label caption = new Label("");
+        caption.setTextFill(Color.AQUA);
+        graphLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
+
+        Tooltip container = new Tooltip();
+        double tot = 0;
+        for (PieChart.Data d : chart.getData()) {
+            tot += d.getPieValue();
+        }
+        final double total = tot;
+        chart.getData().forEach((data) ->
+        {
+            data.getNode().
+                    addEventHandler(MouseEvent.MOUSE_ENTERED, e ->
+                    {
+                        if (container.isShowing())
+                        {
+                            container.hide();
+                        }
+                        String text = String.format("%.1f%%", 100*data.getPieValue()/total) ;
+                        caption.setText(text);
+                        container.show(borderPane, e.getScreenX(), e.getScreenY());
+                    });
+        });
+        vbox.getChildren().addAll(chart, caption);
         vbox.setAlignment(Pos.CENTER);
 
         return vbox;
@@ -197,12 +225,14 @@ public class DataTab {
         long max = propertyAssessments.getMax();
         int maxInt = (int)max;
         List<Integer> list = new ArrayList<>();
+        int mean = propertyAssessments.getMean();
+        long median = propertyAssessments.getMedian();
 
-        list.add(200000);
-        list.add(500000);
-        list.add(1000000);
-        list.add(50000000);
-        list.add(maxInt);
+        list.add((((mean / 2) + 99) / 100 ) * 100);
+        list.add((int)(((median) + 99) / 100 ) * 100);
+        list.add((((mean) + 99) / 100 ) * 100);
+        list.add((((mean * 2) + 99) / 100 ) * 100);
+        list.add(((maxInt + 99) / 100 ) * 100);
 
         List<Integer> quantity = new ArrayList<>();
         while(quantity.size() < 5)
