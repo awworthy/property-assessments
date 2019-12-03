@@ -36,8 +36,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.text.NumberFormat;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 
@@ -75,16 +73,20 @@ public class PropertyTable extends Application {
         TabPane tabPane = new TabPane();
         Tab tab1 = new Tab("Assessments");
         Tab tab2 = new Tab("Map");
-        Tab tab3 = new Tab("Tab 3");
+        Tab tab3 = new Tab("Map 3");
+        Tab tab4 = new Tab("Visualizations");
         tab1.setClosable(false);
         tab2.setClosable(false);
         tab3.setClosable(false);
-        tabPane.getTabs().addAll(tab1, tab2, tab3);
+        tab4.setClosable(false);
+        tabPane.getTabs().addAll(tab1, tab2, tab3, tab4);
         tab1.setContent(borderPane);
         MapTab map =  new MapTab();
         tab2.setContent(map.start(propertyAssessments));
-//        Tab3 map2 = new Tab3();
-//        tab3.setContent(map2.start(propertyAssessments));
+        Tab3 map2 = new Tab3();
+        tab3.setContent(map2.start(propertyAssessments));
+        DataTab vis = new DataTab();
+        tab4.setContent(vis.start(propertyAssessments));
 
         Scene scene = new Scene(tabPane, 1200, 600);
         String darkMode = getClass().getResource("./darkMode.css").toExternalForm();
