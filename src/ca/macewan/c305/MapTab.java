@@ -65,10 +65,11 @@ public class MapTab {
         textArea.setMaxWidth(200);
 
         //shea addition
-        Map<String, List<Location>> neighborhoodBounds = getCoordinates("Neighbourhood_20Boundaries_20_Tableau_.csv");
+        //Map<String, List<Location>> neighborhoodBounds = getCoordinates("Neighbourhood_20Boundaries_20_Tableau_.csv");
         //for testing
-//        Map<String, List<Location>> neighborhoodBounds = getCoordinates("nBounds.csv");
-        Map<String, List<Location>> wardBounds = getCoordinates("Municipal_20Ward_20Boundaries_20_Tableau_.csv");
+        Map<String, List<Location>> neighborhoodBounds = getCoordinates("nBounds.csv");
+        //Map<String, List<Location>> wardBounds = getCoordinates("Municipal_20Ward_20Boundaries_20_Tableau_.csv");
+        Map<String, List<Location>> wardBounds = getCoordinates("wBound.csv");
         final Label neighbourhoodLabel = new Label("Search for neighbourhood");
         Set<String> neighbourhoodSet = propertyAssessments.getNeighborhoodSet();
         ObservableList<String> options = FXCollections.observableArrayList(neighbourhoodSet);
@@ -178,13 +179,13 @@ public class MapTab {
         VBox vbox = new VBox();
         //vbox.setPadding(new Insets(10,10,10,10));
 
-        URL mapUrl = getClass().getResource("Map.html"); //PLEASE do not keep this enabled during dev as it will burn into my free credits
+        //URL mapUrl = getClass().getResource("Map.html"); //PLEASE do not keep this enabled during dev as it will burn into my free credits
 
         /* Use below file for testing. If you want to see fancy map, uncomment the the above
          * line and comment out the below line
          * Don't forget to switch it back
          */
-        //URL mapUrl = getClass().getResource("testing.html");
+        URL mapUrl = getClass().getResource("testing.html");
 
         webEngine.load(mapUrl.toExternalForm());
 
@@ -248,31 +249,35 @@ public class MapTab {
     private static Map<String, List<Location>> getCoordinates(String filename) throws IOException, NumberFormatException {
         Scanner file = new Scanner(Paths.get(filename));
         int n = getLength(file);
-
-        // re-read file as scanner needs to point at beginning again
         file = new Scanner(Paths.get(filename));
         Map<String, List<Location>> coordinates = new HashMap<>();
         List<Location> bounds = new ArrayList<>();
 
-        String currentLine = file.nextLine();
-        String[] lineArray = currentLine.split(",");
-        String name = lineArray[0];
-        Location coordinate = new Location(Double.parseDouble(lineArray[1]), Double.parseDouble(lineArray[2]));
-        bounds.add(coordinate);
+        String currentLine = file.nextLine(); // set currentLine to first line in file
+        String[] lineArray = currentLine.split(","); // split line by commas
+        String name = lineArray[0]; // set name to first name of file
+        String compare = "";
+        Location coordinate = new Location(Double.parseDouble(lineArray[1]), Double.parseDouble(lineArray[2])); // set coordinate
+        bounds.add(coordinate); // put first coordinate in bounds list
         for (int i = 0 ; i < n && file.hasNextLine() ; i++){
             // iterate through each line and make a Property Assessment from each
-            currentLine = file.nextLine();
+            currentLine = file.nextLine(); // iterate to next line
             lineArray = currentLine.split(",");
-            if(lineArray[0].equals(name)){
-                coordinate = new Location(Double.parseDouble(lineArray[1]), Double.parseDouble(lineArray[2]));
-                bounds.add(coordinate);
+            compare = lineArray[0]; // set compare string to this line's name
+            coordinate = new Location(Double.parseDouble(lineArray[1]), Double.parseDouble(lineArray[2])); // set coordinate
+            System.out.println("Name = " + name + ", Compare = " + compare + ", Equal = " + compare.equals(name) + ", Coordinate = " + coordinate);
+            if(compare.equals(name)){
+                bounds.add(coordinate); // if compare and name are equal, add coordinate to bounds list
             }
             else{
-                coordinates.put(name, bounds);
-                bounds.clear();
-                coordinate = new Location(Double.parseDouble(lineArray[1]), Double.parseDouble(lineArray[2]));
-                bounds.add(coordinate);
-                name = lineArray[0];
+                List<Location>boundsCopy = new ArrayList<>(); // if compare an name are not equal, make a deep copy of bounds list
+                for(Location coord : bounds) {
+                    boundsCopy.add(coord.getCopy());
+                }
+                coordinates.put(name, boundsCopy); // add name(key) and deep copy of bounds list(value) to coordinates hash map
+                bounds.clear(); // clear bounds list
+                bounds.add(coordinate); // add coordinate to boudns list
+                name = compare; // reset name
             }
         }
         System.out.println(Arrays.asList(coordinates));
