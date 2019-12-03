@@ -5,6 +5,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import java.io.IOException;
+import java.text.NumberFormat;
 import java.util.*;
 
 /**
@@ -296,17 +297,18 @@ public class PropertyAssessments {
     }
 
     public String toString() {
+        NumberFormat moneyMaker = NumberFormat.getCurrencyInstance();
         // Printing the collection produces the following data
         int N = this.getPopulation();
         String str = "";
         if (N > 0) {
             str = str + "N = " + N;
-            str = str + "\nMin = " + this.getMin();
-            str = str + "\nMax = " + this.getMax();
-            str = str + "\nRange = " + this.getRange();
-            str = str + "\nMean = " + this.getMean();
-            str = str + "\nStandard Deviation = " + this.getStDev();
-            str = str + "\nMedian = " + this.getMedian();
+            str = str + "\nMin = " + moneyMaker.format(this.getMin());
+            str = str + "\nMax = " + moneyMaker.format(this.getMax());
+            str = str + "\nRange = " + moneyMaker.format(this.getRange());
+            str = str + "\nMean = " + moneyMaker.format(this.getMean());
+            str = str + "\nStandard Deviation = " + moneyMaker.format(this.getStDev());
+            str = str + "\nMedian = " + moneyMaker.format(this.getMedian());
         } else {
             str = str + "Descriptive Statistics not available\n";
         }
