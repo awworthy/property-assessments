@@ -41,15 +41,17 @@
             width:90%;
             height: 100%;
             margin: 0 0 0 10%;
-            background: white;
+            background: black;
         }
         #min{
+            color: white;
             font-size: 0.8em;
             padding-top: 15em;
             line-height: 1em;
             margin: 0 0 0 1px;
         }
         #max{
+            color: white;
             font-size: 0.8em;
             margin: 5px 0 0 1px;
             line-height: 1em;
@@ -94,6 +96,40 @@
                         "featureType": "landscape",
                         "elementType": "geometry",
                         "stylers": [{"color": "#000000"}]
+                    },
+                    {
+                        "featureType": "administrative",
+                        "elementType": "geometry",
+                        "stylers": [
+                            {
+                                "visibility": "off"
+                            }
+                        ]
+                    },
+                    {
+                        "featureType": "transit",
+                        "stylers": [
+                            {
+                                "visibility": "off"
+                            }
+                        ]
+                    },
+                    {
+                        "featureType": "road",
+                        "elementType": "labels.icon",
+                        "stylers": [
+                            {
+                                "visibility": "off"
+                            }
+                        ]
+                    },
+                    {
+                        "featureType": "poi",
+                        "stylers": [
+                            {
+                                "visibility": "off"
+                            }
+                        ]
                     },
                     {
                         featureType: 'administrative.locality',
