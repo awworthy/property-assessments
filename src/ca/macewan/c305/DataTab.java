@@ -78,7 +78,7 @@ public class DataTab {
                 BorderStrokeStyle.SOLID, new CornerRadii(4), BorderWidths.DEFAULT)));
 
         final PieChart chart = new PieChart(pieData);
-        chart.setTitle("Property Value Brackets");
+        chart.setTitle("Property Assessments by Range of Value");
         chart.setLabelsVisible(false);
         Node ns = chart.lookup(".chart-legend");
         ns.setStyle("-fx-background-color: #505078, blue;" +
