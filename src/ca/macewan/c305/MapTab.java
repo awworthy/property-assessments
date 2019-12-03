@@ -263,6 +263,7 @@ public class MapTab {
         List<Location> bounds = new ArrayList<>();
 
         String currentLine = file.nextLine(); // set currentLine to first line in file
+        currentLine = currentLine.replaceFirst("^\uFEFF", "");
         String[] lineArray = currentLine.split(","); // split line by commas
         String name = lineArray[0]; // set name to first name of file
         String compare = "";
@@ -272,7 +273,7 @@ public class MapTab {
             // iterate through each line and make a Property Assessment from each
             currentLine = file.nextLine(); // iterate to next line
             lineArray = currentLine.split(",");
-            compare = lineArray[0]; // set compare string to this line's name
+            compare = lineArray[0]; ; // set compare string to this line's name
             coordinate = new Location(Double.parseDouble(lineArray[1]), Double.parseDouble(lineArray[2])); // set coordinate
             System.out.println("Name = " + name + ", Compare = " + compare + ", Equal = " + compare.equals(name) + ", Coordinate = " + coordinate);
             if(compare.equals(name)){
