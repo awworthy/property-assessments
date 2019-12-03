@@ -102,13 +102,13 @@ public class MapTab {
                     String neighborhoodName = (String)neighbourhoodBox.getValue();
                     PropertyAssessments neighborhood = propertyAssessments.getAssessmentsByNeighbourhood(neighborhoodName);
                     customCollection = neighborhood;
-                    Location centre = neighborhood.getCentre();
+                    Location centre = getCentre(neighborhoodBounds.get(neighborhoodName));
                     List<Location> neighborhoodCoordinates =  neighborhoodBounds.get(neighborhoodName);
                     if (webEngine != null) {
-                        jsGoMap(centre, 15, neighborhoodCoordinates);
+                        jsGoMap(centre, 14, neighborhoodCoordinates);
                     }
                     updateLegend(neighborhood);
-                    textArea.setText(neighborhoodName + "\n" + neighborhood.toString());
+                    textArea.setText(neighborhoodName + "\n" + neighborhood.toString() + "\n" + neighborhood.getFirstPropertyAssessment().getNeighbourhood().getWard());
                     neighbourhoodBox.setValue(null);
                     wardBox.setValue(null);
                 }
@@ -122,7 +122,7 @@ public class MapTab {
                     String wardName = (String)wardBox.getValue();
                     PropertyAssessments ward = propertyAssessments.getAssessmentsByWard(wardName.toUpperCase());
                     customCollection = ward;
-                    Location centre = ward.getCentre();
+                    Location centre = getCentre(wardBounds.get(wardName.toUpperCase()));
                     List<Location> wardCoordinates = wardBounds.get(wardName.toUpperCase());
                     if (webEngine != null) {
                         jsGoMap(centre, 12, wardCoordinates);
@@ -238,7 +238,7 @@ public class MapTab {
     }
 
     //shea addition
-    private void jsGoMap(Location centre, int zoom, List<Location> bounds){
+    private void jsGoMap(Location centre, double zoom, List<Location> bounds){
         StringBuilder jsArray = new StringBuilder();
         jsArray.append(centre.getLatitude() + ", " + centre.getLongitude() + ", " + zoom);
         //webEngine.executeScript("legend("+ propertyAssessments.getMax() + ","+ propertyAssessments.getMin() +")");
@@ -312,5 +312,27 @@ public class MapTab {
     private void updateLegend(PropertyAssessments properties){
         webEngine.executeScript("legend(\"" + moneyMaker.format(properties.getMax())+ "\",\"" + moneyMaker.format(properties.getMin()) +"\")");
 
+    }
+
+    public Location getCentre(List<Location>coordinates) {
+        Double minLatitude = 90.0;
+        Double maxLatitude = -90.0;
+        Double minLongitude = 180.0;
+        Double maxLongitude = -180.0;
+        for (Location l : coordinates) {
+            if (l.getLatitude() > maxLatitude) {
+                maxLatitude = l.getLatitude();
+            }
+            if (l.getLatitude() < minLatitude) {
+                minLatitude = l.getLatitude();
+            }
+            if (l.getLongitude() > maxLongitude) {
+                maxLongitude = l.getLongitude();
+            }
+            if (l.getLongitude() < minLongitude) {
+                minLongitude = l.getLongitude();
+            }
+        }
+        return new Location((maxLatitude + minLatitude) / 2, (maxLongitude + minLongitude) / 2);
     }
 }
