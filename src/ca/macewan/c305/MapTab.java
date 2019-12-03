@@ -99,6 +99,9 @@ public class MapTab {
             @Override
             public void handle(ActionEvent actionEvent) {
                 if (neighbourhoodBox.getValue() != null) {
+                    if(webEngine != null) {
+                        webEngine.executeScript("clearMap()");
+                    }
                     String neighborhoodName = (String)neighbourhoodBox.getValue();
                     PropertyAssessments neighborhood = propertyAssessments.getAssessmentsByNeighbourhood(neighborhoodName);
                     customCollection = neighborhood;
@@ -119,6 +122,9 @@ public class MapTab {
             @Override
             public void handle(ActionEvent actionEvent) {
                 if (wardBox.getValue() != null) {
+                    if(webEngine != null) {
+                        webEngine.executeScript("clearMap()");
+                    }
                     String wardName = (String)wardBox.getValue();
                     PropertyAssessments ward = propertyAssessments.getAssessmentsByWard(wardName.toUpperCase());
                     customCollection = ward;
