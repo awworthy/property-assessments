@@ -5,18 +5,19 @@ package ca.macewan.c305;
  *
  *  CMPT 305:
  *      Fall 2019
- *  Assignment 1:
- *      Milestone 2
- *  Name:
+ *  Final Project
+ *      Custom Property Assessments Application
+ *  Names:
  *      Alex Worthy
- *  ID:
- *      1742554
+ *      Dakota Doolaege
+ *      Shea Odland
  */
 
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -50,6 +51,7 @@ public class PropertyTable extends Application {
 
 
     Stage stage;
+    DataTab vis;
 
     public static void main(String[] args) {
         launch(args);
@@ -76,20 +78,15 @@ public class PropertyTable extends Application {
         TabPane tabPane = new TabPane();
         Tab tab1 = new Tab("Assessments");
         Tab tab2 = new Tab("Map");
-        Tab tab3 = new Tab("Map 3");
-        Tab tab4 = new Tab("Visualizations");
+        Tab tab3 = new Tab("Visualizations");
         tab1.setClosable(false);
         tab2.setClosable(false);
         tab3.setClosable(false);
-        tab4.setClosable(false);
-        tabPane.getTabs().addAll(tab1, tab2, tab3, tab4);
+        tabPane.getTabs().addAll(tab1, tab2, tab3);
         tab1.setContent(borderPane);
         MapTab map =  new MapTab();
         tab2.setContent(map.start(propertyAssessments));
-        //Tab3 map2 = new Tab3();
-        //tab3.setContent(map2.start(propertyAssessments));
-        DataTab vis = new DataTab();
-        tab4.setContent(vis.start(propertyAssessments));
+        vis = new DataTab();
 
         Scene scene = new Scene(tabPane, 1200, 600);
         primaryStage.setScene(scene);
@@ -133,7 +130,18 @@ public class PropertyTable extends Application {
         tableBox.getChildren().addAll(tableHeader, table /* hBox */ );
         //tableBox.getChildren().addAll(searchLabel, searchfield1);
 
+        Task task = new Task<Void>() {
+            @Override public Void call() {
+                Platform.runLater(new Runnable() {
+                    @Override public void run() {
+                        tab3.setContent(vis.start(propertyAssessments));
+                    }
+                });
+                return null;
+            }
+        };
         primaryStage.show();
+        new Thread(task).start();
     }
 
     private void configureTable() {
@@ -278,6 +286,7 @@ public class PropertyTable extends Application {
             accountField.clear();
             addressField.clear();
             neighbourhoodField.clear();
+            vis.update(searchAssessments);
         });
         resetBtn.setOnAction(event -> {
             accountField.clear();
@@ -288,6 +297,7 @@ public class PropertyTable extends Application {
 
             properties = FXCollections.observableArrayList(propertyAssessments.getPropertyAssessments());
             table.setItems(properties);
+            vis.update(propertyAssessments);
         });
 
         Separator separator = new Separator();
@@ -325,6 +335,7 @@ public class PropertyTable extends Application {
 
                         // reset the stats box on the left border
                         statsText.setText(propertyAssessments.toString());
+                        vis.update(propertyAssessments);
                     } catch (Exception ex) {
                         //ex.printStackTrace();
                         String err = "The file " + file.getName() + " does not contain property assessment data in a readable format";
