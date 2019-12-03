@@ -52,6 +52,7 @@ public class PropertyTable extends Application {
 
     Stage stage;
     DataTab vis;
+    MapTab map;
 
     public static void main(String[] args) {
         launch(args);
@@ -84,7 +85,7 @@ public class PropertyTable extends Application {
         tab3.setClosable(false);
         tabPane.getTabs().addAll(tab1, tab2, tab3);
         tab1.setContent(borderPane);
-        MapTab map =  new MapTab();
+        map =  new MapTab();
         tab2.setContent(map.start(propertyAssessments));
         vis = new DataTab();
 
@@ -135,6 +136,20 @@ public class PropertyTable extends Application {
                 Platform.runLater(new Runnable() {
                     @Override public void run() {
                         tab3.setContent(vis.start(propertyAssessments));
+                    }
+                });
+                return null;
+            }
+        };
+        Task task2 = new Task<Void>() {
+            @Override public Void call() {
+                Platform.runLater(new Runnable() {
+                    @Override public void run() {
+                        try {
+                            tab2.setContent(map.start(propertyAssessments));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
                 });
                 return null;
@@ -287,6 +302,7 @@ public class PropertyTable extends Application {
             addressField.clear();
             neighbourhoodField.clear();
             vis.update(searchAssessments);
+            map.update(searchAssessments);
         });
         resetBtn.setOnAction(event -> {
             accountField.clear();
@@ -298,6 +314,7 @@ public class PropertyTable extends Application {
             properties = FXCollections.observableArrayList(propertyAssessments.getPropertyAssessments());
             table.setItems(properties);
             vis.update(propertyAssessments);
+            map.update(propertyAssessments);
         });
 
         Separator separator = new Separator();
@@ -336,6 +353,7 @@ public class PropertyTable extends Application {
                         // reset the stats box on the left border
                         statsText.setText(propertyAssessments.toString());
                         vis.update(propertyAssessments);
+                        map.update(propertyAssessments);
                     } catch (Exception ex) {
                         //ex.printStackTrace();
                         String err = "The file " + file.getName() + " does not contain property assessment data in a readable format";
