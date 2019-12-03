@@ -61,7 +61,8 @@ public class PropertyAssessments {
         for (PropertyAssessment propertyAssessment : this.propertyAssessmentsList) {
             // Compare each assessment's ward with the search word
             String thisWard = propertyAssessment.getNeighbourhood().getWard().toUpperCase();
-            if (thisWard.startsWith(ward.toUpperCase())) {
+
+            if (thisWard.equals(ward.toUpperCase())) {
                 // Add a valid property assessment to the new collection
                 wardAssessments.addPropertyAssessment(propertyAssessment);
             }

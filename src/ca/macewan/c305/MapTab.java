@@ -30,6 +30,7 @@ public class MapTab {
     WebView webView = new WebView();
     WebEngine webEngine = webView.getEngine();
     PropertyAssessments propertyAssessments;
+    PropertyAssessments customCollection;
 
     /**
      * Creates a new BorderPane that contains the map and a side menu of options
@@ -94,6 +95,7 @@ public class MapTab {
                 if (neighbourhoodBox.getValue() != null) {
                     String neighborhoodName = (String)neighbourhoodBox.getValue();
                     PropertyAssessments neighborhood = propertyAssessments.getAssessmentsByNeighbourhood(neighborhoodName);
+                    customCollection = neighborhood;
                     Location centre = neighborhood.getCentre();
                     List<Location> neighborhoodCoordinates =  neighborhoodBounds.get(neighborhoodName);
                     if (webEngine != null) {
@@ -112,6 +114,7 @@ public class MapTab {
                 if (wardBox.getValue() != null) {
                     String wardName = (String)wardBox.getValue();
                     PropertyAssessments ward = propertyAssessments.getAssessmentsByWard(wardName);
+                    customCollection = ward;
                     Location centre = ward.getCentre();
                     List<Location> wardCoordinates = wardBounds.get(wardName);
                     if (webEngine != null) {
@@ -120,6 +123,7 @@ public class MapTab {
                     textArea.setText(wardName + "\n" + ward.toString());
                     neighbourhoodBox.setValue(null);
                     wardBox.setValue(null);
+
                 }
             }
         });
@@ -141,7 +145,27 @@ public class MapTab {
                 }
             }
         });
-        vbox.getChildren().addAll(searchLabel, heatMapBtn, neighbourhoodLabel, hBox, wardLabel, hBox2, textArea);
+        //Clear Map Bttn
+        Button clearMapBtn = new Button();
+        clearMapBtn.setMaxWidth(150);
+        clearMapBtn.setText("Clear Heatmap");
+        clearMapBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                if(webEngine != null) {
+                    webEngine.executeScript("clearMap()");
+                }
+            }
+        });
+        vbox.getChildren().addAll(
+                searchLabel,
+                heatMapBtn,
+                neighbourhoodLabel,
+                hBox,
+                wardLabel,
+                hBox2,
+                textArea,
+                clearMapBtn);
         return vbox;
     }
 
@@ -176,10 +200,17 @@ public class MapTab {
      */
     private void jsLoadProperties(){
         StringBuilder jsArray = new StringBuilder();
+        PropertyAssessments dataset;
+        if (customCollection != null){
+            dataset = customCollection;
+        }
+        else {
+            dataset = propertyAssessments;
+        }
         jsArray.append("[");
         String point = "";
         int c = 0;
-        for (PropertyAssessment property : propertyAssessments.getPropertyAssessments()){
+        for (PropertyAssessment property : dataset.getPropertyAssessments()){
             point = "["+ property.getLatitude()+", "+property.getLongitude() + "," + property.getValue() + "],";
             jsArray.append(point);
             c++;
@@ -200,14 +231,18 @@ public class MapTab {
         StringBuilder jsArray = new StringBuilder();
         jsArray.append(centre.getLatitude() + ", " + centre.getLongitude() + ", " + zoom);
         webEngine.executeScript("setCentreAndZoom(" + jsArray.toString() + ")");
-//        StringBuilder jsArray2 = new StringBuilder();
-//        jsArray2.setLength(0);
-//        jsArray2.append("[");
-//        for (Location l: bounds) {
-//            jsArray2.append(l.getLatitude() + ", " + l.getLongitude());
-//        }
-//        jsArray2.append("]");
-//        webEngine.executeScript("drawBoundary(" + jsArray2.toString() + ")");
+        StringBuilder jsArray2 = new StringBuilder();
+        jsArray2.setLength(0);
+        jsArray2.append("[");
+        for (Location l: bounds) {
+            System.out.println(l.getLatitude() + " , " + l.getLongitude());
+            jsArray2.append("[" + l.getLatitude() + ", " + l.getLongitude() + "],");
+        }
+
+        jsArray2.deleteCharAt(jsArray2.length()-1);
+        jsArray2.append("]");
+        System.out.println(jsArray2.toString());
+        webEngine.executeScript("drawBoundary(" + jsArray2.toString() + ")");
     }
 
     private static Map<String, List<Location>> getCoordinates(String filename) throws IOException, NumberFormatException {
