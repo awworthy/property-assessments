@@ -5,12 +5,12 @@ package ca.macewan.c305;
  *
  *  CMPT 305:
  *      Fall 2019
- *  Assignment 1:
- *      Milestone 2
- *  Name:
+ *  Final Project
+ *      Custom Property Assessments Application
+ *  Names:
  *      Alex Worthy
- *  ID:
- *      1742554
+ *      Dakota Doolaege
+ *      Shea Odland
  */
 
 import javafx.application.Application;
