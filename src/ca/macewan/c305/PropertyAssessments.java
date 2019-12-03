@@ -41,6 +41,13 @@ public class PropertyAssessments {
         return this.propertyAssessmentsList;
     }
 
+    public PropertyAssessment getFirstPropertyAssessment() {
+        if(!this.propertyAssessmentsList.isEmpty()) {
+            return this.propertyAssessmentsList.get(0);
+        }
+        return null;
+    }
+
     public void addPropertyAssessment(PropertyAssessment propertyAssessment) {
         // Adds a property assessment to the collection
         propertyAssessmentsList.add(propertyAssessment);
@@ -121,7 +128,7 @@ public class PropertyAssessments {
         Iterator itr = wardSetCopy.iterator();
         itr.next();
         //Convert string set to integer set for sorting
-        while(itr.hasNext()) {
+        while (itr.hasNext()) {
             String s = (String) itr.next();
             String[] arr = s.split(" ");
             toConvert.add(Integer.parseInt(arr[1]));
@@ -129,35 +136,10 @@ public class PropertyAssessments {
         //convert to sorted string array
         itr = toConvert.iterator();
         String[] toRet = new String[toConvert.size()];
-        for(int i = 0; i < toRet.length; i++) {
+        for (int i = 0; i < toRet.length; i++) {
             toRet[i] = "Ward " + itr.next();
         }
         return toRet;
-    }
-
-    //shea add
-
-    public Location getCentre() {
-        Double minLatitude = 90.0;
-        Double maxLatitude = -90.0;
-        Double minLongitude = 180.0;
-        Double maxLongitude = -180.0;
-        for (PropertyAssessment p : this.getPropertyAssessments()) {
-            if (p.getLatitude() > maxLatitude) {
-                maxLatitude = p.getLatitude();
-            }
-            if (p.getLatitude() < minLatitude) {
-                minLatitude = p.getLatitude();
-            }
-            if (p.getLongitude() > maxLongitude) {
-                maxLongitude = p.getLongitude();
-            }
-            if (p.getLongitude() < minLongitude) {
-                minLongitude = p.getLongitude();
-            }
-        }
-//        this.maxNWLocation = new Location
-        return new Location((maxLatitude + minLatitude) / 2, (maxLongitude + minLongitude) / 2);
     }
 
     public PropertyAssessments getAssessmentsByClass(String classInput) {
