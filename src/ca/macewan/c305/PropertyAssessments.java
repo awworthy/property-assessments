@@ -40,10 +40,6 @@ public class PropertyAssessments {
         return this.propertyAssessmentsList;
     }
 
-//    public Location getCentre() {
-//        return this.centre;
-//    }
-
     public void addPropertyAssessment(PropertyAssessment propertyAssessment) {
         // Adds a property assessment to the collection
         propertyAssessmentsList.add(propertyAssessment);
@@ -59,19 +55,17 @@ public class PropertyAssessments {
 
     //shea addition
     public PropertyAssessments getAssessmentsByWard(String ward) {
-        // Returns neighbourhood-specific collection of property assessments
+        // Returns ward-specific collection of property assessments
         PropertyAssessments wardAssessments = new PropertyAssessments();
 
         for (PropertyAssessment propertyAssessment : this.propertyAssessmentsList) {
-            // Compare each assessment's neighbourhood with the search word
+            // Compare each assessment's ward with the search word
             String thisWard = propertyAssessment.getNeighbourhood().getWard().toUpperCase();
-            //String thisNeighbourhood = nbhood.getNeighbourhood();
 
             if (thisWard.equals(ward.toUpperCase())) {
                 // Add a valid property assessment to the new collection
                 wardAssessments.addPropertyAssessment(propertyAssessment);
             }
-
         }
         return wardAssessments;
     }

@@ -44,6 +44,11 @@ public class Location {
         return this.longitude;
     }
 
+    public Location getCopy() {
+        Location locationCopy = new Location(this.getLatitude(), this.getLongitude());
+        return locationCopy;
+    }
+
     public String toString() {
         return "(" + this.latitude + ", " + this.longitude + ")";
     }
