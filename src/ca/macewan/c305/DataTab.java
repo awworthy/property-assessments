@@ -210,6 +210,11 @@ public class DataTab {
                         container.setText(text);
                         container.show(borderPane, e.getScreenX(), e.getScreenY());
                     });
+            data.getNode().
+                    addEventHandler(MouseEvent.MOUSE_CLICKED, e ->
+                    {
+                        container.hide();
+                    });
         });
         vbox.getChildren().addAll(chart);
         vbox.setAlignment(Pos.CENTER);
