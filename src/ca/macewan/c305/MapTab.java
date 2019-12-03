@@ -19,6 +19,7 @@ import javafx.scene.web.WebView;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Paths;
+import java.text.NumberFormat;
 import java.util.*;
 
 /**
@@ -31,6 +32,7 @@ public class MapTab {
     WebEngine webEngine = webView.getEngine();
     PropertyAssessments propertyAssessments;
     PropertyAssessments customCollection;
+    NumberFormat moneyMaker = NumberFormat.getCurrencyInstance();
 
     /**
      * Creates a new BorderPane that contains the map and a side menu of options
@@ -39,7 +41,9 @@ public class MapTab {
      * @return borderPane that contains all the content for the map tab
      */
     public BorderPane start(PropertyAssessments propertyAssessments) throws IOException {
+        moneyMaker.setMaximumFractionDigits(0);
         this.propertyAssessments = propertyAssessments;
+
         BorderPane borderPane = new BorderPane();
         borderPane.setPadding(new Insets(5));
 
@@ -69,7 +73,7 @@ public class MapTab {
         //for testing
 //        Map<String, List<Location>> neighborhoodBounds = getCoordinates("nBounds.csv");
         Map<String, List<Location>> wardBounds = getCoordinates("Municipal_20Ward_20Boundaries_20_Tableau_.csv");
-        final Label neighbourhoodLabel = new Label("Search for neighbourhood");
+        final Label neighbourhoodLabel = new Label("Select neighbourhood");
         Set<String> neighbourhoodSet = propertyAssessments.getNeighborhoodSet();
         ObservableList<String> options = FXCollections.observableArrayList(neighbourhoodSet);
         final ComboBox neighbourhoodBox = new ComboBox(options);
@@ -79,7 +83,7 @@ public class MapTab {
         hBox.setSpacing(10);
         hBox.getChildren().addAll(neighbourhoodBox, goButton);
 
-        final Label wardLabel = new Label("Search for ward");
+        final Label wardLabel = new Label("Select ward");
         String[] wardSet = propertyAssessments.getSortedWardList();
         ObservableList<String> options2 = FXCollections.observableArrayList(wardSet);
         final ComboBox wardBox = new ComboBox(options2);
@@ -101,6 +105,7 @@ public class MapTab {
                     if (webEngine != null) {
                         jsGoMap(centre, 15, neighborhoodCoordinates);
                     }
+                    updateLegend(neighborhood);
                     textArea.setText(neighborhoodName + "\n" + neighborhood.toString());
                     neighbourhoodBox.setValue(null);
                     wardBox.setValue(null);
@@ -120,6 +125,7 @@ public class MapTab {
                     if (webEngine != null) {
                         jsGoMap(centre, 12, wardCoordinates);
                     }
+                    updateLegend(ward);
                     textArea.setText(wardName + "\n" + ward.toString());
                     neighbourhoodBox.setValue(null);
                     wardBox.setValue(null);
@@ -148,23 +154,25 @@ public class MapTab {
         //Clear Map Bttn
         Button clearMapBtn = new Button();
         clearMapBtn.setMaxWidth(150);
-        clearMapBtn.setText("Clear Heatmap");
+        clearMapBtn.setText("Clear Map");
         clearMapBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
                 if(webEngine != null) {
                     webEngine.executeScript("clearMap()");
                 }
+                textArea.clear();
+                customCollection = null;
             }
         });
         vbox.getChildren().addAll(
                 searchLabel,
-                heatMapBtn,
                 neighbourhoodLabel,
                 hBox,
                 wardLabel,
                 hBox2,
                 textArea,
+                heatMapBtn,
                 clearMapBtn);
         return vbox;
     }
@@ -207,6 +215,7 @@ public class MapTab {
         else {
             dataset = propertyAssessments;
         }
+        updateLegend(dataset);
         jsArray.append("[");
         String point = "";
         int c = 0;
@@ -230,18 +239,17 @@ public class MapTab {
     private void jsGoMap(Location centre, int zoom, List<Location> bounds){
         StringBuilder jsArray = new StringBuilder();
         jsArray.append(centre.getLatitude() + ", " + centre.getLongitude() + ", " + zoom);
+        //webEngine.executeScript("legend("+ propertyAssessments.getMax() + ","+ propertyAssessments.getMin() +")");
         webEngine.executeScript("setCentreAndZoom(" + jsArray.toString() + ")");
         StringBuilder jsArray2 = new StringBuilder();
         jsArray2.setLength(0);
         jsArray2.append("[");
         for (Location l: bounds) {
-            System.out.println(l.getLatitude() + " , " + l.getLongitude());
             jsArray2.append("[" + l.getLatitude() + ", " + l.getLongitude() + "],");
         }
 
         jsArray2.deleteCharAt(jsArray2.length()-1);
         jsArray2.append("]");
-        System.out.println(jsArray2.toString());
         webEngine.executeScript("drawBoundary(" + jsArray2.toString() + ")");
     }
 
@@ -288,5 +296,14 @@ public class MapTab {
             n++;
         }
         return n;
+    }
+
+    /**
+     * Updates the legend to the max and min value in the current data
+     * @param properties
+     */
+    private void updateLegend(PropertyAssessments properties){
+        webEngine.executeScript("legend(\"" + moneyMaker.format(properties.getMax())+ "\",\"" + moneyMaker.format(properties.getMin()) +"\")");
+
     }
 }
