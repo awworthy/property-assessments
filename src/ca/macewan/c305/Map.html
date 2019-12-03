@@ -15,10 +15,9 @@
         }
 
         #legend{
-            width: 100px;
-            height: 200px;
+            width: 8em;
+            height: 14em;
             background: rgb(0,255,255);
-            /*background: linear-gradient(180deg, rgba(0,255,255,0) 3%, rgba(142,207,223,1) 20%, rgba(0,255,255,0.01) 100%);*/
             background: linear-gradient(0deg,
             rgba(0, 255, 255, 0.5),
             rgba(0, 255, 255, 1),
@@ -38,23 +37,22 @@
             right: 0;
         }
         #legend-values{
-            width:70%;
+            display: block;
+            width:90%;
             height: 100%;
-            margin: 0 0 0 30%;
-            background: linear-gradient(0deg,
-            rgba(255, 255, 255, 0.8),
-            rgba(255, 255, 255, 0.99) 80%,
-            rgba(255, 255, 255, 0.8));
+            margin: 0 0 0 10%;
+            background: white;
         }
         #min{
-            bottom:0;
-            position: absolute;
+            font-size: 0.8em;
+            padding-top: 15em;
+            line-height: 1em;
             margin: 0 0 0 1px;
         }
         #max{
-            top: 0;
-            position: absolute;
-            margin: 0 0 0 1px;
+            font-size: 0.8em;
+            margin: 5px 0 0 1px;
+            line-height: 1em;
 
         }
 
@@ -65,7 +63,7 @@
 <div id="testing"></div>
 <div id="map"></div>
 <div id="legend">
-    <div id="legend-values"><p id="max">$1000</p><p id="min">$0</p> </div>
+    <div id="legend-values"><p id="max"></p><p id="min"></p> </div>
 </div>
 
 
@@ -224,6 +222,8 @@
     function clearMap(){
         heatmapData.clear();
         areaBoundary.clear();
+        document.getElementById('max').innerHTML = "";
+        document.getElementById('min').innerHTML = "";
     }
     //shea addition
     function setCentreAndZoom(latitude, longitude, zoom){
@@ -235,10 +235,8 @@
     function drawBoundary(boundary){
         var len = boundary.length;
         var latLng;
-        document.getElementById('testing').innerHTML += len + "<br/>";
         for(var i=0; i < len; i++){
             latLng = new google.maps.LatLng(boundary[i][0],boundary[i][1]);
-            document.getElementById('testing').innerHTML += i +": \n\n>x>>>" + latLng + "<br/>";
             areaBoundary.push(latLng);
         }
 
