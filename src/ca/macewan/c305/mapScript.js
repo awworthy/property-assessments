@@ -176,12 +176,14 @@ function addProperties(properties){
     }
 }
 
+//Clears the map data
 function clearMap(){
     heatmapData.clear();
     areaBoundary.clear();
     document.getElementById('max').innerHTML = "";
     document.getElementById('min').innerHTML = "";
 }
+
 //shea addition
 function setCentreAndZoom(latitude, longitude, zoom){
     map.setCenter({lat:latitude, lng:longitude});
@@ -206,6 +208,7 @@ function drawBoundary(boundary){
     });
     boundaryLine.setMap(map);
 }
+
 //Update the legend range
 function legend(max, min){
     document.getElementById('max').innerHTML = max;
