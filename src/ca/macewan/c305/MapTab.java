@@ -40,7 +40,7 @@ public class MapTab {
      * @param propertyAssessments
      * @return borderPane that contains all the content for the map tab
      */
-    public BorderPane start(PropertyAssessments propertyAssessments, WebView webView, WebEngine webEngine) throws IOException {
+    public BorderPane start(PropertyAssessments propertyAssessments, WebView webView, WebEngine webEngine, ObservableList<PropertyAssessment> properties) throws IOException {
         this.propertyAssessments = propertyAssessments;
         this.webView = webView;
         this.webEngine = webEngine;
@@ -49,7 +49,7 @@ public class MapTab {
 
         //VBox searchBox = createSearch();
         VBox mapBox = createMap();
-        SideControls searchBox = new SideControls(this.propertyAssessments, this.webEngine, properties);
+        SideControls searchBox = new SideControls(propertyAssessments, this.webEngine, properties);
 
         borderPane.setLeft(searchBox.getPanel());
         borderPane.setCenter(mapBox);

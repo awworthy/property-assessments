@@ -15,10 +15,13 @@ package ca.macewan.c305;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -64,9 +67,11 @@ public class PropertyTable extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+        propertyAssessments = new PropertyAssessments();
+
         this.stage = primaryStage;
         primaryStage.setTitle("Property Assessments");
-        propertyAssessments = makePropertyAssessments(filename);
+        makePropertyAssessments(filename);
 
         VBox tableBox = new VBox(10);
         //VBox searchBox = addVBox();
@@ -93,6 +98,12 @@ public class PropertyTable extends Application {
         tab1.setClosable(false);
         tab2.setClosable(false);
         tab3.setClosable(false);
+        tab3.setOnSelectionChanged(new EventHandler<Event>() {
+            @Override
+            public void handle(Event event) {
+                vis.refresh();
+            }
+        });
         tabPane.getTabs().addAll(tab1, tab2, tab3);
         tab1.setContent(borderPane);
         map =  new MapTab();
@@ -149,7 +160,7 @@ public class PropertyTable extends Application {
                 return null;
             }
         };
-        tab2.setContent(map.start(propertyAssessments, webView, webEngine));
+        tab2.setContent(map.start(propertyAssessments, webView, webEngine, properties));
         primaryStage.show();
         new Thread(task).start();
     }
@@ -201,7 +212,7 @@ public class PropertyTable extends Application {
         table.getColumns().setAll(acctNumCol, addressCol, assessedValCol, classCol, nbhoodCol, latCol, longCol);
     }
 
-    private static PropertyAssessments makePropertyAssessments(String filename) throws IOException, NumberFormatException {
+    private void makePropertyAssessments(String filename) throws IOException, NumberFormatException {
         Scanner file = new Scanner(Paths.get(filename));
         int n = getLength(file);
 
@@ -211,7 +222,6 @@ public class PropertyTable extends Application {
             file.nextLine();
         }
 
-        PropertyAssessments propertyAssessments = new PropertyAssessments();
 
         for (int i = 0 ; i < n && file.hasNextLine() ; i++){
             // iterate through each line and make a Property Assessment from each
@@ -222,7 +232,6 @@ public class PropertyTable extends Application {
             propertyAssessments.addPropertyAssessment(propertyAssessment);
         }
 
-        return propertyAssessments;
     }
 
     private static int getLength(Scanner file){
@@ -310,8 +319,8 @@ public class PropertyTable extends Application {
 
             //properties = FXCollections.observableArrayList(propertyAssessments.getPropertyAssessments());
             //table.setItems(properties);
-            vis.update(propertyAssessments);
-            map.update(propertyAssessments);
+            //vis.update(propertyAssessments);
+            //map.update(propertyAssessments);
         });
 
         Separator separator = new Separator();
@@ -337,12 +346,12 @@ public class PropertyTable extends Application {
         openFileButton.setOnAction(
                 e -> {
                     // let the user choose the file, get the file path.
-                    File file = fileChooser.showOpenDialog(stage);
+                    File file = fileChooser.showOpenDialog(stage); //hBox.getScene().getWindow())
                     if (file != null)
                         filename = file.getPath();
                     try {
                         // update the main propertyAssessments collection class
-                        propertyAssessments = makePropertyAssessments(filename);
+                        //propertyAssessments = makePropertyAssessments(filename);
 
                         // reset the table
                         //table.setItems(properties);

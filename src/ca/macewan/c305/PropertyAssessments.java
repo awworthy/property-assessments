@@ -167,9 +167,9 @@ public class PropertyAssessments {
     }
 
     private void sortAssessments() {
-        if (sorted)
+        //if (sorted)
             // If already sorted, don't do anything
-            return;
+          //  return;
 
         //Sort the collection and set sorted flag to true if not already sorted
 
@@ -193,7 +193,7 @@ public class PropertyAssessments {
         for (PropertyAssessment propertyAssessment : this.propertyAssessmentsList) {
             sum = sum + propertyAssessment.getValue();
         }
-        return Math.round((int)((double)sum / this.length));
+        return Math.round((int)((double)sum / this.propertyAssessmentsList.size()));
     }
 
     public long getMin() {
@@ -203,12 +203,12 @@ public class PropertyAssessments {
 
     public long getMedian() {
         sortAssessments();
-        if (this.length % 2 == 0){
-            long avg = (this.propertyAssessmentsList.get(this.length/2)).getValue() +
-                    (this.propertyAssessmentsList.get(this.length/2+1)).getValue();
+        if (this.propertyAssessmentsList.size() % 2 == 0){
+            long avg = (this.propertyAssessmentsList.get(this.propertyAssessmentsList.size()/2)).getValue() +
+                    (this.propertyAssessmentsList.get(this.propertyAssessmentsList.size()/2+1)).getValue();
             return avg/2;
         }
-        return (this.propertyAssessmentsList.get(this.length/2)).getValue();
+        return (this.propertyAssessmentsList.get(this.propertyAssessmentsList.size()/2)).getValue();
     }
 
     public int getStDev() {
@@ -219,13 +219,13 @@ public class PropertyAssessments {
             sum = sum + val * val;
         }
 
-        double result = sum / (double) this.length;
+        double result = sum / (double) this.propertyAssessmentsList.size();
         return (int) Math.sqrt(result);
     }
 
     public long getMax() {
         sortAssessments();
-        return (this.propertyAssessmentsList.get(this.length - 1)).getValue();
+        return (this.propertyAssessmentsList.get(this.propertyAssessmentsList.size() - 1)).getValue();
     }
 
     public long getRange() {
@@ -233,7 +233,7 @@ public class PropertyAssessments {
     }
 
     public int getPopulation() {
-        return this.length;
+        return this.propertyAssessmentsList.size();
     }
 
     public PropertyAssessment parseLineToAssessment(String line) throws NumberFormatException {

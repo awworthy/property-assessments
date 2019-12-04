@@ -72,6 +72,12 @@ public class DataTab {
         this.propertyAssessments = propertyAssessments;
     }
 
+    public void refresh(){
+        pieData = getPieData();
+        pieGraphBox = createPieChart(pieData);
+        borderPane.setCenter(pieGraphBox);
+    }
+
     /**
      * Create the left sidebar with different buttons
      * @return VBox to be inserted to left BorderPane

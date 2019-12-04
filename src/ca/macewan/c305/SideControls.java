@@ -34,12 +34,16 @@ public class SideControls{
     private TextField addressField;
     private ObservableList<PropertyAssessment> properties;
     private NumberFormat moneyMaker = NumberFormat.getCurrencyInstance();
+    private Map<String, List<Location>> wardBounds;
+    Map<String, List<Location>> neighborhoodBounds;
 
     /**
      * Creates content for the side bar
      *
      */
     public SideControls(PropertyAssessments propertyAssessments, WebEngine webEngine, ObservableList<PropertyAssessment> properties) throws IOException {
+        wardBounds = getCoordinates("Municipal_20Ward_20Boundaries_20_Tableau_.csv");
+        neighborhoodBounds = getCoordinates("Neighbourhood_20Boundaries_20_Tableau_.csv");
         moneyMaker.setMaximumFractionDigits(0);
         this.propertyAssessments = propertyAssessments;
         this.propertyAssessmentsMaster = deepCopy(propertyAssessments);
@@ -132,19 +136,38 @@ public class SideControls{
             //adding this to fix the current implementation of creating a new list every time
 
             if (!account.equals("")) {
-                propertyAssessments = propertyAssessments.getAssessmentsByAccount(account);
+                propertyAssessments.propertyAssessmentsList = propertyAssessments.getAssessmentsByAccount(account).propertyAssessmentsList;
             }
             if (!address.equals("")) {
-                propertyAssessments = propertyAssessments.getAssessmentsByAddress(address);
+                propertyAssessments.propertyAssessmentsList = propertyAssessments.getAssessmentsByAddress(address).propertyAssessmentsList;
             }
             if (neighbourhood != null) {
-                propertyAssessments = propertyAssessments.getAssessmentsByNeighbourhood(neighbourhood);
-            }
+                propertyAssessments.propertyAssessmentsList = propertyAssessments.getAssessmentsByNeighbourhood(neighbourhood).propertyAssessmentsList;
+                    if(webEngine != null) {
+                        webEngine.executeScript("clearMap()");
+                    }
+                    Location centre = getCentre(neighborhoodBounds.get(neighbourhood));
+                    List<Location> neighborhoodCoordinates =  neighborhoodBounds.get(neighbourhood);
+                    if (webEngine != null) {
+                        jsGoMap(centre, 14, neighborhoodCoordinates);
+                    }
+                }
+
             if (ward != null) {
-                propertyAssessments = propertyAssessments.getAssessmentsByWard(ward);
+                propertyAssessments.propertyAssessmentsList = propertyAssessments.getAssessmentsByWard(ward).propertyAssessmentsList;
+
+                if(webEngine != null) {
+                    webEngine.executeScript("clearMap()");
+                }
+                Location centre = getCentre(wardBounds.get(ward.toUpperCase()));
+                List<Location> wardCoordinates = wardBounds.get(ward.toUpperCase());
+                if (webEngine != null) {
+                    jsGoMap(centre, 12, wardCoordinates);
+                }
+                //updateLegend(ward);
             }
             if (assessmentClass != null) {
-                propertyAssessments = propertyAssessments.getAssessmentsByClass(assessmentClass);
+                propertyAssessments.propertyAssessmentsList = propertyAssessments.getAssessmentsByClass(assessmentClass).propertyAssessmentsList;
             }
 
             //table.setItems(properties);//removed!!
@@ -163,10 +186,11 @@ public class SideControls{
             addressField.clear();
             neighbourhoodBox.setValue(null);
             classBox.setValue(null);
-            propertyAssessments = deepCopy(propertyAssessmentsMaster);
+            PropertyAssessments p = deepCopy(propertyAssessmentsMaster);
+            propertyAssessments.propertyAssessmentsList = p.propertyAssessmentsList;
             textArea.setText(propertyAssessments.toString());
 
-           updateOList(propertyAssessmentsMaster);
+            updateOList(propertyAssessmentsMaster);
         });
 
 
@@ -201,7 +225,6 @@ public class SideControls{
     private VBox neighbourhoodControl() throws IOException{
         VBox neighbourhood = new VBox();
         neighbourhood.setSpacing(5);
-        Map<String, List<Location>> neighborhoodBounds = getCoordinates("Neighbourhood_20Boundaries_20_Tableau_.csv");
         //for testing
         //Map<String, List<Location>> neighborhoodBounds = getCoordinates("nBounds.csv");
         final Label neighbourhoodLabel = new Label("Select neighbourhood");
@@ -209,35 +232,9 @@ public class SideControls{
         ObservableList<String> options = FXCollections.observableArrayList(neighbourhoodSet);
         neighbourhoodBox = new ComboBox(options);
         neighbourhoodBox.setMaxWidth(100);
-        Button goButton = new Button("Go");
         HBox hBox = new HBox();
         hBox.setSpacing(10);
         hBox.getChildren().addAll(neighbourhoodBox);
-
-        //NOTE: Remove these go buttons
-
-        goButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                if (neighbourhoodBox.getValue() != null) {
-                    if(webEngine != null) {
-                        webEngine.executeScript("clearMap()");
-                    }
-                    String neighborhoodName = (String)neighbourhoodBox.getValue();
-                    PropertyAssessments neighborhood = propertyAssessments.getAssessmentsByNeighbourhood(neighborhoodName);
-                    customCollection = neighborhood;
-                    Location centre = getCentre(neighborhoodBounds.get(neighborhoodName));
-                    List<Location> neighborhoodCoordinates =  neighborhoodBounds.get(neighborhoodName);
-                    if (webEngine != null) {
-                        jsGoMap(centre, 14, neighborhoodCoordinates);
-                    }
-                    updateLegend(neighborhood);
-                    textArea.setText(neighborhoodName + "\n" + neighborhood.toString() + "\n" + neighborhood.getFirstPropertyAssessment().getNeighbourhood().getWard());
-                    neighbourhoodBox.setValue(null);
-                    wardBox.setValue(null);
-                }
-            }
-        });
 
         neighbourhood.getChildren().addAll(neighbourhoodLabel, hBox);
         return neighbourhood;
@@ -251,7 +248,6 @@ public class SideControls{
     private VBox wardControl() throws IOException {
         VBox ward = new VBox();
         ward.setSpacing(5);
-        Map<String, List<Location>> wardBounds = getCoordinates("Municipal_20Ward_20Boundaries_20_Tableau_.csv");
         //Map<String, List<Location>> wardBounds = getCoordinates("wBound.csv");
 
         final Label wardLabel = new Label("Select ward");
@@ -259,37 +255,9 @@ public class SideControls{
         ObservableList<String> options2 = FXCollections.observableArrayList(wardSet);
         wardBox = new ComboBox(options2);
         wardBox.setMinWidth(100);
-        Button goButton2 = new Button("Go");
         HBox hBox2 = new HBox();
         hBox2.setSpacing(10);
         hBox2.getChildren().addAll(wardBox);
-
-        //NOTE: Remove these go buttons
-
-        goButton2.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                if (wardBox.getValue() != null) {
-                    if(webEngine != null) {
-                        webEngine.executeScript("clearMap()");
-                    }
-                    String wardName = (String)wardBox.getValue();
-                    PropertyAssessments ward = propertyAssessments.getAssessmentsByWard(wardName.toUpperCase());
-                    customCollection = ward;
-                    Location centre = getCentre(wardBounds.get(wardName.toUpperCase()));
-                    List<Location> wardCoordinates = wardBounds.get(wardName.toUpperCase());
-                    if (webEngine != null) {
-                        jsGoMap(centre, 12, wardCoordinates);
-                    }
-                    updateLegend(ward);
-                    textArea.setText(wardName + "\n" + ward.toString());
-                    neighbourhoodBox.setValue(null);
-                    wardBox.setValue(null);
-
-                }
-            }
-        });
-        //end Shea addition
 
         ward.getChildren().addAll(wardLabel, hBox2);
         return ward;
