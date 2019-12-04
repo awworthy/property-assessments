@@ -26,6 +26,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.web.WebEngine;
@@ -50,7 +51,7 @@ public class PropertyTable extends Application {
     SideControls searchBox;
 
     Stage stage;
-    DataTab vis;
+    static DataTab vis;
     MapTab map;
 
     public static void main(String[] args) {
@@ -67,7 +68,7 @@ public class PropertyTable extends Application {
 
         VBox tableBox = new VBox(10);
 
-        tableBox.setPadding(new Insets(10, 10, 10, 10));
+        tableBox.setPadding(new Insets(0, 0, 0, 10));
         BorderPane borderPane = new BorderPane();
 
         configureTable();
@@ -126,7 +127,10 @@ public class PropertyTable extends Application {
 
         HBox tableHeader = new HBox();
         tableHeader.setHgrow(spacer, Priority.ALWAYS);
-        tableHeader.setSpacing(5);
+        tableHeader.setPadding(new Insets(10,10,10,10));
+        tableHeader.setSpacing(10);
+        tableHeader.setBorder(new Border(new BorderStroke(Color.SILVER,
+                BorderStrokeStyle.SOLID, new CornerRadii(4), BorderWidths.DEFAULT)));
         /* File open button in the following hBox */
         HBox fileBox = makeFileBox();
         tableHeader.getChildren().addAll(tableLabel, spacer, switchTheme, fileBox);

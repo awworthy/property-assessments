@@ -55,7 +55,7 @@ public class DataTab {
     public BorderPane start(PropertyAssessments propertyAssessments, WebView webView, WebEngine webEngine, ObservableList<PropertyAssessment> properties) throws IOException {
         this.propertyAssessments = propertyAssessments;
         borderPane = new BorderPane();
-        borderPane.setPadding(new Insets(10));
+        borderPane.setPadding(new Insets(5));
 
         pieData = getPieData();
         SideControls searchBox = new SideControls(propertyAssessments, webEngine, properties);
@@ -117,7 +117,9 @@ public class DataTab {
                 borderPane.setCenter(barBox);
             }
         });
-        hbox.getChildren().addAll(graphLabel, pieChartButton, scatterButton, barButton);
+        Region spacer = new Region();
+        hbox.setHgrow(spacer, Priority.ALWAYS);
+        hbox.getChildren().addAll(graphLabel,spacer, pieChartButton, scatterButton, barButton);
         return hbox;
     }
 
@@ -127,11 +129,9 @@ public class DataTab {
      */
     private VBox createBarBox() {
         VBox vbox = new VBox();
+        vbox.setPadding(new Insets(0, 0, 0, 10));
         final Label graphLabel = new Label("Data Visualization");
         graphLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
-        vbox.setPadding(new Insets(10,10,10,10));
-        vbox.setBorder(new Border(new BorderStroke(Color.SILVER,
-                BorderStrokeStyle.SOLID, new CornerRadii(4), BorderWidths.DEFAULT)));
 
         CategoryAxis xAxis = new CategoryAxis();
         xAxis.setLabel("Wards");
@@ -157,11 +157,9 @@ public class DataTab {
      */
     private VBox createScatter() {
         VBox vbox = new VBox();
+        vbox.setPadding(new Insets(0, 0, 0, 10));
         final Label graphLabel = new Label("Data Visualization");
         graphLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
-        vbox.setPadding(new Insets(10,10,10,10));
-        vbox.setBorder(new Border(new BorderStroke(Color.SILVER,
-                BorderStrokeStyle.SOLID, new CornerRadii(4), BorderWidths.DEFAULT)));
 
         CategoryAxis xAxis = new CategoryAxis();
         xAxis.setLabel("Neighbourhoods");
@@ -187,14 +185,12 @@ public class DataTab {
      * @return VBox to be inserted into BorderPane
      */
     private VBox createPieChart(ObservableList<PieChart.Data> pieData) {
-        VBox vbox = new VBox();
+        VBox vbox = new VBox(10);
+        vbox.setPadding(new Insets(0, 0, 0, 10));
         final Label graphLabel = new Label("Data Visualization");
         graphLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
-        vbox.setPadding(new Insets(10,10,10,10));
-        vbox.setBorder(new Border(new BorderStroke(Color.SILVER,
-                BorderStrokeStyle.SOLID, new CornerRadii(4), BorderWidths.DEFAULT)));
-
         final PieChart chart = new PieChart(pieData);
+
         chart.setTitle("Property Assessments by Range of Value");
         //chart.setLabelsVisible(false);
         Node ns = chart.lookup(".chart-legend");

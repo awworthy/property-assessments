@@ -22,7 +22,6 @@ import java.util.*;
  */
 public class SideControls{
     private WebEngine webEngine;
-    private PropertyAssessments customCollection;
     private PropertyAssessments propertyAssessmentsMaster; //The list that is loaded in at the start or when changing datasets
     private PropertyAssessments propertyAssessments; //The subset
     private VBox vbox;
@@ -62,7 +61,6 @@ public class SideControls{
         VBox neighbourhoodControls = neighbourhoodControl();
         VBox wardControls = wardControl();
         VBox classControls = classControl();
-        HBox mapControls = mapControl();
         VBox inputControls = inputControl();
         HBox searchControls = searchControl();
 
@@ -74,8 +72,7 @@ public class SideControls{
                 wardControls,
                 classControls,
                 textArea,
-                searchControls,
-                mapControls
+                searchControls
         );
     }
 
@@ -88,45 +85,6 @@ public class SideControls{
         updateOList(propertyAssessments);
     }
 
-    /**
-     * Creates the controls for the map tab
-     * @return
-     */
-    private HBox mapControl(){
-        HBox controls = new HBox();
-        controls.setSpacing(5);
-
-        //Heatmap bttn
-        Button heatMapBtn = new Button();
-        heatMapBtn.setMaxWidth(150);
-        heatMapBtn.setText("Activate Heatmap");
-        heatMapBtn.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                if(webEngine != null) {
-                    jsLoadProperties();
-                }
-            }
-        });
-
-        //Clear Map bttn
-        Button clearMapBtn = new Button();
-        clearMapBtn.setMaxWidth(150);
-        clearMapBtn.setText("Clear Map");
-        clearMapBtn.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                if(webEngine != null) {
-                    webEngine.executeScript("clearMap()");
-                }
-                textArea.clear();
-                customCollection = null;
-            }
-        });
-
-        controls.getChildren().addAll(heatMapBtn, clearMapBtn);
-        return controls;
-    }
 
     /**
      * Creates the search controls
@@ -185,7 +143,7 @@ public class SideControls{
 
             updateOList(propertyAssessments);
             textArea.setText(propertyAssessments.toString());
-
+            PropertyTable.vis.refresh();
             accountField.clear();
             addressField.clear();
         });
@@ -199,6 +157,7 @@ public class SideControls{
             PropertyAssessments p = deepCopy(propertyAssessmentsMaster);
             propertyAssessments.propertyAssessmentsList = p.propertyAssessmentsList;
             textArea.setText(propertyAssessments.toString());
+            PropertyTable.vis.refresh();
 
             updateOList(propertyAssessmentsMaster);
         });
@@ -415,14 +374,6 @@ public class SideControls{
         webEngine.executeScript("drawBoundary(" + jsArray2.toString() + ")");
     }
 
-    /**
-     * Updates the legend to the max and min value in the current data
-     * @param properties
-     */
-    private void updateLegend(PropertyAssessments properties){
-        webEngine.executeScript("legend(\"" + moneyMaker.format(properties.getMax())+ "\",\"" + moneyMaker.format(properties.getMin()) +"\")");
-
-    }
 
     /**
      *
@@ -439,39 +390,5 @@ public class SideControls{
             n++;
         }
         return n;
-    }
-
-    /**
-     * Converts the list of properties in the PropertyAssessment class into a javascript
-     * array and sends the array to the javascript function in the map document
-     *
-     */
-    private void jsLoadProperties(){
-        StringBuilder jsArray = new StringBuilder();
-        PropertyAssessments dataset;
-        if (customCollection != null){
-            dataset = customCollection;
-        }
-        else {
-            dataset = propertyAssessments;
-        }
-        updateLegend(dataset);
-        jsArray.append("[");
-        String point = "";
-        int c = 0;
-        for (PropertyAssessment property : dataset.getPropertyAssessments()){
-            point = "["+ property.getLatitude()+", "+property.getLongitude() + "," + property.getValue() + "],";
-            jsArray.append(point);
-            c++;
-            if (c > 100000){ //Sends properties in batches of max size 100000 to avoid js range error
-                jsArray.append("]");
-                webEngine.executeScript("addProperties("+ jsArray.toString()+")");
-                jsArray = new StringBuilder();
-                jsArray.append("[");
-                c=0;
-            }
-        }
-        jsArray.append("]");
-        webEngine.executeScript("addProperties("+ jsArray.toString()+")");
     }
 }
