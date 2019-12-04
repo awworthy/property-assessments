@@ -19,6 +19,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -28,18 +29,16 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.text.NumberFormat;
 import java.util.Scanner;
-import java.util.Set;
 
 public class PropertyTable extends Application {
 
@@ -47,11 +46,12 @@ public class PropertyTable extends Application {
     private ObservableList<PropertyAssessment> properties;
     private PropertyAssessments propertyAssessments;
     private String filename = "Property_Assessment_Data__Current_Calendar_Year_.csv";
-    private TextArea statsText;
-
+    WebView webView = new WebView();
+    WebEngine webEngine = webView.getEngine();
+    SideControls searchBox;
 
     Stage stage;
-    DataTab vis;
+    static DataTab vis;
     MapTab map;
 
     public static void main(String[] args) {
@@ -60,20 +60,23 @@ public class PropertyTable extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+        propertyAssessments = new PropertyAssessments();
+
         this.stage = primaryStage;
         primaryStage.setTitle("Property Assessments");
-        propertyAssessments = makePropertyAssessments(filename);
+        makePropertyAssessments(filename);
 
         VBox tableBox = new VBox(10);
-        VBox searchBox = addVBox();
 
-        tableBox.setPadding(new Insets(10, 10, 10, 10));
-        searchBox.setPadding(new Insets(10,10,10,10));
+        tableBox.setPadding(new Insets(0, 0, 0, 10));
         BorderPane borderPane = new BorderPane();
-        searchBox.setBorder(new Border(new BorderStroke(Color.SILVER,
-                BorderStrokeStyle.SOLID, new CornerRadii(4), BorderWidths.DEFAULT)));
+
+        configureTable();
+
+        searchBox = new SideControls(propertyAssessments, webEngine, properties);
+
         borderPane.setCenter(tableBox);
-        borderPane.setLeft(searchBox);
+        borderPane.setLeft(searchBox.getPanel());
         borderPane.setPadding(new Insets(5));
 
         TabPane tabPane = new TabPane();
@@ -83,10 +86,15 @@ public class PropertyTable extends Application {
         tab1.setClosable(false);
         tab2.setClosable(false);
         tab3.setClosable(false);
+        tab3.setOnSelectionChanged(new EventHandler<Event>() {
+            @Override
+            public void handle(Event event) {
+                vis.refresh();
+            }
+        });
         tabPane.getTabs().addAll(tab1, tab2, tab3);
         tab1.setContent(borderPane);
         map =  new MapTab();
-        tab2.setContent(map.start(propertyAssessments));
         vis = new DataTab();
 
         Scene scene = new Scene(tabPane, 1200, 600);
@@ -119,34 +127,27 @@ public class PropertyTable extends Application {
 
         HBox tableHeader = new HBox();
         tableHeader.setHgrow(spacer, Priority.ALWAYS);
-        tableHeader.getChildren().addAll(tableLabel, spacer, switchTheme);
+        tableHeader.setPadding(new Insets(10,10,10,10));
+        tableHeader.setSpacing(10);
+        tableHeader.setBorder(new Border(new BorderStroke(Color.SILVER,
+                BorderStrokeStyle.SOLID, new CornerRadii(4), BorderWidths.DEFAULT)));
+        /* File open button in the following hBox */
+        HBox fileBox = makeFileBox();
+        tableHeader.getChildren().addAll(tableLabel, spacer, switchTheme, fileBox);
 
-        configureTable();
 
         final Label searchLabel =  new Label("Find Property Assessment");
         tableLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
 
-        //hBox.getChildren().addAll(firstNameField, lastNameField, taxField, addBtn);
         tableBox.setVgrow(table, Priority.ALWAYS);
         tableBox.getChildren().addAll(tableHeader, table /* hBox */ );
-        //tableBox.getChildren().addAll(searchLabel, searchfield1);
 
         Task task = new Task<Void>() {
             @Override public Void call() {
                 Platform.runLater(new Runnable() {
                     @Override public void run() {
-                        tab3.setContent(vis.start(propertyAssessments));
-                    }
-                });
-                return null;
-            }
-        };
-        Task task2 = new Task<Void>() {
-            @Override public Void call() {
-                Platform.runLater(new Runnable() {
-                    @Override public void run() {
                         try {
-                            tab2.setContent(map.start(propertyAssessments));
+                            tab3.setContent(vis.start(propertyAssessments, webView, webEngine, properties));
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -155,13 +156,13 @@ public class PropertyTable extends Application {
                 return null;
             }
         };
+        tab2.setContent(map.start(propertyAssessments, webView, webEngine, properties));
         primaryStage.show();
         new Thread(task).start();
     }
 
     private void configureTable() {
         table = new TableView<>();
-
 
         properties = FXCollections.observableArrayList(propertyAssessments.getPropertyAssessments());
         table.setItems(properties);
@@ -206,7 +207,7 @@ public class PropertyTable extends Application {
         table.getColumns().setAll(acctNumCol, addressCol, assessedValCol, classCol, nbhoodCol, latCol, longCol);
     }
 
-    private static PropertyAssessments makePropertyAssessments(String filename) throws IOException, NumberFormatException {
+    private void makePropertyAssessments(String filename) throws IOException, NumberFormatException {
         Scanner file = new Scanner(Paths.get(filename));
         int n = getLength(file);
 
@@ -216,8 +217,6 @@ public class PropertyTable extends Application {
             file.nextLine();
         }
 
-        PropertyAssessments propertyAssessments = new PropertyAssessments();
-
         for (int i = 0 ; i < n && file.hasNextLine() ; i++){
             // iterate through each line and make a Property Assessment from each
             String currentLine = file.nextLine();
@@ -226,8 +225,6 @@ public class PropertyTable extends Application {
             // add propertyAssessment to List
             propertyAssessments.addPropertyAssessment(propertyAssessment);
         }
-
-        return propertyAssessments;
     }
 
     private static int getLength(Scanner file){
@@ -242,91 +239,6 @@ public class PropertyTable extends Application {
         return n;
     }
 
-    private VBox addVBox() {
-        VBox vbox = new VBox();
-        vbox.setPadding(new Insets(12,10,10,10));
-        vbox.setSpacing(10);
-
-        final Label title = new Label("Find Property Search");
-        title.setFont(Font.font("Arial", FontWeight.BOLD, 16));
-
-        final Label accountLabel = new Label("Account Number:");
-        TextField accountField = new TextField();
-        final Label addressLabel = new Label("Address (#suite #house street):");
-        TextField addressField = new TextField();
-        final Label neighbourhoodLabel = new Label("Neighbourhood:");
-        TextField neighbourhoodField = new TextField();
-        final Label assessLabel = new Label("Assessment Class:");
-
-        Set<String> classSet = propertyAssessments.getClassSet();
-        ObservableList<String> options = FXCollections.observableArrayList(classSet);
-        final ComboBox classBox = new ComboBox(options);
-
-        HBox hBox = new HBox(10);
-
-        statsText = new TextArea();
-        statsText.setText(propertyAssessments.toString());
-        statsText.setMaxWidth(200);
-
-        Button searchBtn = new Button("Search");
-        Button resetBtn = new Button("Reset");
-        searchBtn.setOnAction(event -> {
-            String account = accountField.getText().strip();
-            String address = addressField.getText().strip();
-            String neighbourhood = neighbourhoodField.getText().strip();
-            String assessmentClass = (String)classBox.getValue();
-
-            PropertyAssessments searchAssessments = propertyAssessments;
-
-            if (!account.equals("")) {
-                searchAssessments = searchAssessments.getAssessmentsByAccount(account);
-                properties = FXCollections.observableArrayList(searchAssessments.getPropertyAssessments());
-            }
-            if (!neighbourhood.equals("")) {
-                searchAssessments = searchAssessments.getAssessmentsByNeighbourhood(neighbourhood);
-                properties = FXCollections.observableArrayList(searchAssessments.getPropertyAssessments());
-            }
-            if (!address.equals("")) {
-                searchAssessments = searchAssessments.getAssessmentsByAddress(address);
-                properties = FXCollections.observableArrayList(searchAssessments.getPropertyAssessments());
-            }
-            if (assessmentClass != null) {
-                searchAssessments = searchAssessments.getAssessmentsByClass(assessmentClass);
-                properties = FXCollections.observableArrayList(searchAssessments.getPropertyAssessments());
-            }
-
-            table.setItems(properties);
-            statsText.setText(searchAssessments.toString());
-
-            accountField.clear();
-            addressField.clear();
-            neighbourhoodField.clear();
-            vis.update(searchAssessments);
-            map.update(searchAssessments);
-        });
-        resetBtn.setOnAction(event -> {
-            accountField.clear();
-            addressField.clear();
-            neighbourhoodField.clear();
-            classBox.setValue(null);
-            statsText.setText(propertyAssessments.toString());
-
-            properties = FXCollections.observableArrayList(propertyAssessments.getPropertyAssessments());
-            table.setItems(properties);
-            vis.update(propertyAssessments);
-            map.update(propertyAssessments);
-        });
-
-        Separator separator = new Separator();
-
-        /* File open button in the following hBox */
-        HBox fileBox = makeFileBox();
-
-        hBox.getChildren().addAll(searchBtn, resetBtn);
-        vbox.getChildren().addAll(title, accountLabel, accountField, addressLabel, addressField, neighbourhoodLabel, neighbourhoodField, assessLabel, classBox, hBox, separator, statsText, fileBox);
-        return vbox;
-    }
-
     /**
      * makeFileBox()
      *      Creates a new hBox containing a button. The button allows a user to bring up a file explorer window
@@ -335,25 +247,20 @@ public class PropertyTable extends Application {
      */
     private HBox makeFileBox() {
         FileChooser fileChooser = new FileChooser();
-        final Button openFileButton = new Button("Choose custom file");
+        final Button openFileButton = new Button("Load Custom Dataset");
         HBox hBox = new HBox(10);
         openFileButton.setOnAction(
                 e -> {
                     // let the user choose the file, get the file path.
-                    File file = fileChooser.showOpenDialog(stage);
+                    File file = fileChooser.showOpenDialog(stage); //hBox.getScene().getWindow())
                     if (file != null)
                         filename = file.getPath();
                     try {
                         // update the main propertyAssessments collection class
-                        propertyAssessments = makePropertyAssessments(filename);
+                        propertyAssessments.propertyAssessmentsList.clear();
+                        makePropertyAssessments(filename);
+                        searchBox.updateMasterList();
 
-                        // reset the table
-                        table.setItems(properties);
-
-                        // reset the stats box on the left border
-                        statsText.setText(propertyAssessments.toString());
-                        vis.update(propertyAssessments);
-                        map.update(propertyAssessments);
                     } catch (Exception ex) {
                         //ex.printStackTrace();
                         String err = "The file " + file.getName() + " does not contain property assessment data in a readable format";

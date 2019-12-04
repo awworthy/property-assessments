@@ -1,8 +1,6 @@
 /*
-
  Regular styling for the application
  */
-
 
 .sidebar{
     -fx-background-radius: 10px;
@@ -22,7 +20,6 @@
 .table-view .column-header,
 .table-view .column-header-background .filler {
     -fx-border-width: 0px;
-
 }
 
 .text-area, .text-field, .combo-box, .combo-box .cell:selected{

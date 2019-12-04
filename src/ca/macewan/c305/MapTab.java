@@ -1,194 +1,56 @@
 package ca.macewan.c305;
 
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
-
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Paths;
 import java.text.NumberFormat;
-import java.util.*;
 
 /**
- * Map class handles the functions related to the Map tab in the property assessments program
+ * Map tab class
  *
  * @author Dakota Doolaege
  */
 public class MapTab {
-    WebView webView = new WebView();
-    WebEngine webEngine = webView.getEngine();
-    PropertyAssessments propertyAssessments;
-    PropertyAssessments customCollection;
-    NumberFormat moneyMaker = NumberFormat.getCurrencyInstance();
+    private WebView webView;
+    private WebEngine webEngine;
+    private PropertyAssessments customCollection;
+    private PropertyAssessments propertyAssessments; //The subset
+    private NumberFormat moneyMaker = NumberFormat.getCurrencyInstance();
 
     /**
      * Creates a new BorderPane that contains the map and a side menu of options
      *
      * @param propertyAssessments
+     * @param webView
+     * @param webEngine
+     * @param properties
      * @return borderPane that contains all the content for the map tab
      */
-    public BorderPane start(PropertyAssessments propertyAssessments) throws IOException {
+    public BorderPane start(PropertyAssessments propertyAssessments, WebView webView, WebEngine webEngine, ObservableList<PropertyAssessment> properties) throws IOException {
         moneyMaker.setMaximumFractionDigits(0);
+        this.webView = webView;
+        this.webEngine = webEngine;
         this.propertyAssessments = propertyAssessments;
-
         BorderPane borderPane = new BorderPane();
         borderPane.setPadding(new Insets(5));
 
-        VBox searchBox = createSearch();
         VBox mapBox = createMap();
+        SideControls searchBox = new SideControls(propertyAssessments, this.webEngine, properties);
 
-        borderPane.setLeft(searchBox);
+        borderPane.setLeft(searchBox.getPanel());
         borderPane.setCenter(mapBox);
-
         return borderPane;
-    }
-    /**
-     * Updates the scene's version of propertyAssessments
-     * @param propertyAssessments
-     */
-    public void update(PropertyAssessments propertyAssessments) {
-        this.propertyAssessments = propertyAssessments;
-    }
-    /**
-     * Creates content for the side bar
-     *
-     * @return The side options panel for controlling the map
-     */
-    private VBox createSearch() throws IOException {
-        VBox vbox = new VBox();
-        final Label searchLabel =  new Label("Map Options");
-        searchLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
-        TextArea textArea = new TextArea();
-        textArea.setMaxWidth(200);
-
-        //shea addition
-        Map<String, List<Location>> neighborhoodBounds = getCoordinates("Neighbourhood_20Boundaries_20_Tableau_.csv");
-        //for testing
-        //Map<String, List<Location>> neighborhoodBounds = getCoordinates("nBounds.csv");
-        Map<String, List<Location>> wardBounds = getCoordinates("Municipal_20Ward_20Boundaries_20_Tableau_.csv");
-        //Map<String, List<Location>> wardBounds = getCoordinates("wBound.csv");
-
-        final Label neighbourhoodLabel = new Label("Select neighbourhood");
-        Set<String> neighbourhoodSet = propertyAssessments.getNeighborhoodSet();
-        ObservableList<String> options = FXCollections.observableArrayList(neighbourhoodSet);
-        final ComboBox neighbourhoodBox = new ComboBox(options);
-        neighbourhoodBox.setMaxWidth(100);
-        Button goButton = new Button("Go");
-        HBox hBox = new HBox();
-        hBox.setSpacing(10);
-        hBox.getChildren().addAll(neighbourhoodBox, goButton);
-
-        final Label wardLabel = new Label("Select ward");
-        String[] wardSet = propertyAssessments.getSortedWardList();
-        ObservableList<String> options2 = FXCollections.observableArrayList(wardSet);
-        final ComboBox wardBox = new ComboBox(options2);
-        wardBox.setMinWidth(100);
-        Button goButton2 = new Button("Go");
-        HBox hBox2 = new HBox();
-        hBox2.setSpacing(10);
-        hBox2.getChildren().addAll(wardBox, goButton2);
-
-        goButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                if (neighbourhoodBox.getValue() != null) {
-                    if(webEngine != null) {
-                        webEngine.executeScript("clearMap()");
-                    }
-                    String neighborhoodName = (String)neighbourhoodBox.getValue();
-                    PropertyAssessments neighborhood = propertyAssessments.getAssessmentsByNeighbourhood(neighborhoodName);
-                    customCollection = neighborhood;
-                    Location centre = getCentre(neighborhoodBounds.get(neighborhoodName));
-                    List<Location> neighborhoodCoordinates =  neighborhoodBounds.get(neighborhoodName);
-                    if (webEngine != null) {
-                        jsGoMap(centre, 14, neighborhoodCoordinates);
-                    }
-                    updateLegend(neighborhood);
-                    textArea.setText(neighborhoodName + "\n" + neighborhood.toString() + "\n" + neighborhood.getFirstPropertyAssessment().getNeighbourhood().getWard());
-                    neighbourhoodBox.setValue(null);
-                    wardBox.setValue(null);
-                }
-            }
-        });
-
-        goButton2.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                if (wardBox.getValue() != null) {
-                    if(webEngine != null) {
-                        webEngine.executeScript("clearMap()");
-                    }
-                    String wardName = (String)wardBox.getValue();
-                    PropertyAssessments ward = propertyAssessments.getAssessmentsByWard(wardName.toUpperCase());
-                    customCollection = ward;
-                    Location centre = getCentre(wardBounds.get(wardName.toUpperCase()));
-                    List<Location> wardCoordinates = wardBounds.get(wardName.toUpperCase());
-                    if (webEngine != null) {
-                        jsGoMap(centre, 12, wardCoordinates);
-                    }
-                    updateLegend(ward);
-                    textArea.setText(wardName + "\n" + ward.toString());
-                    neighbourhoodBox.setValue(null);
-                    wardBox.setValue(null);
-
-                }
-            }
-        });
-        //end Shea addition
-
-        vbox.setPadding(new Insets(10,10,10,10));
-        vbox.setSpacing(10);
-        vbox.setBorder(new Border(new BorderStroke(Color.SILVER,
-                BorderStrokeStyle.SOLID, new CornerRadii(4), BorderWidths.DEFAULT)));
-
-        Button heatMapBtn = new Button();
-        heatMapBtn.setMaxWidth(150);
-        heatMapBtn.setText("Activate Heatmap");
-        heatMapBtn.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                if(webEngine != null) {
-                    jsLoadProperties();
-                }
-            }
-        });
-        //Clear Map Bttn
-        Button clearMapBtn = new Button();
-        clearMapBtn.setMaxWidth(150);
-        clearMapBtn.setText("Clear Map");
-        clearMapBtn.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                if(webEngine != null) {
-                    webEngine.executeScript("clearMap()");
-                }
-                textArea.clear();
-                customCollection = null;
-            }
-        });
-        vbox.getChildren().addAll(
-                searchLabel,
-                neighbourhoodLabel,
-                hBox,
-                wardLabel,
-                hBox2,
-                textArea,
-                heatMapBtn,
-                clearMapBtn);
-        return vbox;
     }
 
     /**
@@ -197,7 +59,9 @@ public class MapTab {
      * @return returns a local html document that contains the embed map
      */
     private VBox createMap(){
-        VBox vbox = new VBox();
+        VBox vbox = new VBox(10);
+        vbox.setPadding(new Insets(0, 0, 0, 10));
+        HBox mapControls = mapControl();
         //vbox.setPadding(new Insets(10,10,10,10));
 
         URL mapUrl = getClass().getResource("Map.html"); //PLEASE do not keep this enabled during dev as it will burn into my free credits
@@ -210,9 +74,55 @@ public class MapTab {
 
         webEngine.load(mapUrl.toExternalForm());
 
-        vbox.getChildren().addAll(webView);
+        vbox.getChildren().addAll(mapControls, webView);
         VBox.setVgrow(webView, Priority.ALWAYS);
         return vbox;
+    }
+    /**
+     * Creates the controls for the map tab
+     * @return
+     */
+    private HBox mapControl(){
+        HBox controls = new HBox();
+        final Label graphLabel =  new Label("Map Options");
+        graphLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
+        controls.setPadding(new Insets(10,10,10,10));
+        controls.setSpacing(10);
+        controls.setBorder(new Border(new BorderStroke(Color.SILVER,
+                BorderStrokeStyle.SOLID, new CornerRadii(4), BorderWidths.DEFAULT)));
+        controls.setSpacing(5);
+
+        //Heatmap bttn
+        Button heatMapBtn = new Button();
+        heatMapBtn.setMaxWidth(150);
+        heatMapBtn.setText("Activate Heatmap");
+        heatMapBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                if(webEngine != null) {
+                    jsLoadProperties();
+                }
+            }
+        });
+
+        //Clear Map bttn
+        Button clearMapBtn = new Button();
+        clearMapBtn.setMaxWidth(150);
+        clearMapBtn.setText("Clear Map");
+        clearMapBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                if(webEngine != null) {
+                    webEngine.executeScript("clearMap()");
+                }
+                customCollection = null;
+            }
+        });
+
+        Region spacer = new Region();
+        controls.setHgrow(spacer, Priority.ALWAYS);
+        controls.getChildren().addAll(graphLabel,spacer, heatMapBtn, clearMapBtn);
+        return controls;
     }
 
     /**
@@ -249,102 +159,12 @@ public class MapTab {
         webEngine.executeScript("addProperties("+ jsArray.toString()+")");
     }
 
-    //shea addition
-    private void jsGoMap(Location centre, double zoom, List<Location> bounds){
-        StringBuilder jsArray = new StringBuilder();
-        jsArray.append(centre.getLatitude() + ", " + centre.getLongitude() + ", " + zoom);
-        //webEngine.executeScript("legend("+ propertyAssessments.getMax() + ","+ propertyAssessments.getMin() +")");
-        webEngine.executeScript("setCentreAndZoom(" + jsArray.toString() + ")");
-        StringBuilder jsArray2 = new StringBuilder();
-        jsArray2.setLength(0);
-        jsArray2.append("[");
-        for (Location l: bounds) {
-            jsArray2.append("[" + l.getLatitude() + ", " + l.getLongitude() + "],");
-        }
-
-        jsArray2.deleteCharAt(jsArray2.length()-1);
-        jsArray2.append("]");
-        webEngine.executeScript("drawBoundary(" + jsArray2.toString() + ")");
-    }
-
-    private static Map<String, List<Location>> getCoordinates(String filename) throws IOException, NumberFormatException {
-        Scanner file = new Scanner(Paths.get(filename));
-        int n = getLength(file);
-        file = new Scanner(Paths.get(filename));
-        Map<String, List<Location>> coordinates = new HashMap<>();
-        List<Location> bounds = new ArrayList<>();
-
-        String currentLine = file.nextLine(); // set currentLine to first line in file
-        currentLine = currentLine.replaceFirst("^\uFEFF", "");
-        String[] lineArray = currentLine.split(","); // split line by commas
-        String name = lineArray[0]; // set name to first name of file
-        String compare = "";
-        Location coordinate = new Location(Double.parseDouble(lineArray[1]), Double.parseDouble(lineArray[2])); // set coordinate
-        bounds.add(coordinate); // put first coordinate in bounds list
-        for (int i = 0 ; i <= n && file.hasNextLine() ; i++){
-            // iterate through each line and make a Property Assessment from each
-            currentLine = file.nextLine(); // iterate to next line
-            lineArray = currentLine.split(",");
-            compare = lineArray[0]; ; // set compare string to this line's name
-            coordinate = new Location(Double.parseDouble(lineArray[1]), Double.parseDouble(lineArray[2])); // set coordinate
-            if(compare.equals(name) && file.hasNextLine()){
-                bounds.add(coordinate); // if compare and name are equal, add coordinate to bounds list
-            }
-            else{
-                List<Location>boundsCopy = new ArrayList<>(); // if compare an name are not equal, make a deep copy of bounds list
-                for(Location coord : bounds) {
-                    boundsCopy.add(coord.getCopy());
-                }
-                coordinates.put(name, boundsCopy); // add name(key) and deep copy of bounds list(value) to coordinates hash map
-                bounds.clear(); // clear bounds list
-                bounds.add(coordinate); // add coordinate to boudns list
-                name = compare; // reset name
-            }
-
-        }
-        return coordinates;
-    }
-
-    private static int getLength(Scanner file){
-        int n = 0;
-        if (file.hasNextLine()) {
-            file.nextLine();
-        }
-        while (file.hasNextLine()) {
-            file.nextLine();
-            n++;
-        }
-        return n;
-    }
-
     /**
      * Updates the legend to the max and min value in the current data
      * @param properties
      */
     private void updateLegend(PropertyAssessments properties){
-        webEngine.executeScript("legend(\"" + moneyMaker.format(properties.getMax())+ "\",\"" + moneyMaker.format(properties.getMin()) +"\")");
-
-    }
-
-    public Location getCentre(List<Location>coordinates) {
-        Double minLatitude = 90.0;
-        Double maxLatitude = -90.0;
-        Double minLongitude = 180.0;
-        Double maxLongitude = -180.0;
-        for (Location l : coordinates) {
-            if (l.getLatitude() > maxLatitude) {
-                maxLatitude = l.getLatitude();
-            }
-            if (l.getLatitude() < minLatitude) {
-                minLatitude = l.getLatitude();
-            }
-            if (l.getLongitude() > maxLongitude) {
-                maxLongitude = l.getLongitude();
-            }
-            if (l.getLongitude() < minLongitude) {
-                minLongitude = l.getLongitude();
-            }
-        }
-        return new Location((maxLatitude + minLatitude) / 2, (maxLongitude + minLongitude) / 2);
+        if(properties.propertyAssessmentsList.size() > 1)
+            webEngine.executeScript("legend(\"" + moneyMaker.format(properties.getMax())+ "\",\"" + moneyMaker.format(properties.getMin()) +"\")");
     }
 }
