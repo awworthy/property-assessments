@@ -15,7 +15,7 @@ The core project is a property assessment management tool that uses .CSV files t
 
 ### Custom Features
 * Custom File Selector
-* Google API Embedded Map
+* Google API JavaScript Map
     * Heat Map of assessed values
     * Search map by neighbourhood
     * Search Map by Ward
@@ -24,3 +24,14 @@ The core project is a property assessment management tool that uses .CSV files t
         * Percentages displayed with mouse-over
     * Scatter plot with neighbourhoods and average property value
     * Bar Graph with wards and average property values
+    * Ward and Neighbourhood searches will draw shapes on the map
+* Custom Class for Data Set options
+    * Allows user to perform multiple consecutive searches to refine their results
+    * Allows for all the tabs to share the same data 
+    * The same search options on each tab
+    * Selecting based on ward
+    * Updates the data used by the heatmap and the charts and the table on each search
+* Support for additional themes
+    * Dark mode
+* TABS -  update this
+    
