@@ -257,20 +257,10 @@ public class PropertyTable extends Application {
                         filename = file.getPath();
                     try {
                         // update the main propertyAssessments collection class
-                        System.out.println("here");
                         propertyAssessments.propertyAssessmentsList.clear();
-                        System.out.println(propertyAssessments.propertyAssessmentsList.size());
                         makePropertyAssessments(filename);
                         searchBox.updateMasterList();
-                        System.out.println(propertyAssessments.propertyAssessmentsList.size());
 
-                        // reset the table
-                        //table.setItems(properties);
-
-                        // reset the stats box on the left border
-                        //statsText.setText(propertyAssessments.toString());
-                        //vis.update(propertyAssessments);
-                        //map.update(propertyAssessments);
                     } catch (Exception ex) {
                         //ex.printStackTrace();
                         String err = "The file " + file.getName() + " does not contain property assessment data in a readable format";

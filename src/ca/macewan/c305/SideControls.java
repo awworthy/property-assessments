@@ -97,7 +97,6 @@ public class SideControls{
         Button searchBtn = new Button("Search");
         searchBtn.setOnAction(event -> {
 
-            System.out.println(propertyAssessments.propertyAssessmentsList.size());
             String account = accountField.getText().strip();
             String address = addressField.getText().strip();
             String neighbourhood = (String)neighbourhoodBox.getValue();

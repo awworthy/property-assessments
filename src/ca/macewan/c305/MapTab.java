@@ -41,6 +41,7 @@ public class MapTab {
         moneyMaker.setMaximumFractionDigits(0);
         this.webView = webView;
         this.webEngine = webEngine;
+        this.propertyAssessments = propertyAssessments;
         BorderPane borderPane = new BorderPane();
         borderPane.setPadding(new Insets(5));
 
@@ -163,8 +164,7 @@ public class MapTab {
      * @param properties
      */
     private void updateLegend(PropertyAssessments properties){
-        webEngine.executeScript("legend(\"" + moneyMaker.format(properties.getMax())+ "\",\"" + moneyMaker.format(properties.getMin()) +"\")");
-
+        if(properties.propertyAssessmentsList.size() > 1)
+            webEngine.executeScript("legend(\"" + moneyMaker.format(properties.getMax())+ "\",\"" + moneyMaker.format(properties.getMin()) +"\")");
     }
-
 }
