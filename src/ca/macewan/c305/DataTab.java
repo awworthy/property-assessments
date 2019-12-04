@@ -267,6 +267,10 @@ public class DataTab {
      */
     public ObservableList<PieChart.Data> getPieData()
     {
+        ObservableList<PieChart.Data> pieChartData =
+                FXCollections.observableArrayList();
+        if(propertyAssessments.propertyAssessmentsList.size() < 1)
+            return  pieChartData;
         long max = propertyAssessments.getMax();
         int maxInt = (int)max;
         List<Integer> list = new ArrayList<>();
@@ -296,8 +300,6 @@ public class DataTab {
                 quantity.set(4, quantity.get(4) + 1);
             }
         }
-        ObservableList<PieChart.Data> pieChartData =
-                FXCollections.observableArrayList();
         for (int i = 0; i < 5 ; i++ ) {
             Integer key = (list.get(i)/100000);
             Integer value = quantity.get(i);
