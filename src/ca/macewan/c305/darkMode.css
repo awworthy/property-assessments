@@ -1,14 +1,12 @@
 /*
 Dark mode styling for the application
 
-
-Based on material design dark theme:
+Based on material design dark color scheme:
 https://material.io/design/color/dark-theme
  */
 
 .root{
     -fx-background-color: #000;
-
 }
 
 .label, .text-area{
@@ -52,10 +50,8 @@ https://material.io/design/color/dark-theme
     -fx-background-color: #3E50B4;
 }
 
-
 .tab .tab-label{
     -fx-text-fill: #fff;
-
 }
 
 .text-area, .text-field, .combo-box, .combo-box .cell:selected{
@@ -68,7 +64,6 @@ https://material.io/design/color/dark-theme
 .button{
     -fx-background-color: #3E50B4;
     -fx-text-fill: #fff;
-
 }
 
 /*

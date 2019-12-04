@@ -1,0 +1,55 @@
+#map{
+    height: 100%;
+    display: block;
+}
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+
+}
+
+#legend{
+    width: 8em;
+    height: 14em;
+    background: rgb(0,255,255);
+    background: linear-gradient(0deg,
+    rgba(0, 255, 255, 0.5),
+    rgba(0, 255, 255, 1),
+    rgba(0, 191, 255, 1),
+    rgba(0, 127, 255, 1),
+    rgba(0, 63, 255, 1),
+    rgba(0, 0, 223, 1),
+    rgba(0, 0, 159, 1),
+    rgba(0, 0, 127, 1),
+    rgba(63, 0, 91, 1),
+    rgba(127, 0, 63, 1),
+    rgba(191, 0, 31, 1),
+    rgba(191, 0, 31, 0.5));
+    position: absolute;
+    display: grid;
+    bottom: 0;
+    right: 0;
+}
+#legend-values{
+    display: block;
+    width:90%;
+    height: 100%;
+    margin: 0 0 0 10%;
+    background: black;
+}
+#min{
+    color: white;
+    font-size: 0.8em;
+    padding-top: 15em;
+    line-height: 1em;
+    margin: 0 0 0 1px;
+}
+#max{
+    color: white;
+    font-size: 0.8em;
+    margin: 5px 0 0 1px;
+    line-height: 1em;
+
+}
+
