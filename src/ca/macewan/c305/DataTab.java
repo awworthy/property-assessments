@@ -64,14 +64,6 @@ public class DataTab {
         return borderPane;
     }
 
-    /**
-     * Updates the scene's version of propertyAssessments
-     * @param propertyAssessments
-     */
-    public void update(PropertyAssessments propertyAssessments) {
-        this.propertyAssessments = propertyAssessments;
-    }
-
     public void refresh(){
         pieData = getPieData();
         pieGraphBox = createPieChart(pieData);
