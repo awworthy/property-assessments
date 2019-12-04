@@ -142,7 +142,11 @@ public class PropertyTable extends Application {
             @Override public Void call() {
                 Platform.runLater(new Runnable() {
                     @Override public void run() {
-                        tab3.setContent(vis.start(propertyAssessments));
+                        try {
+                            tab3.setContent(vis.start(propertyAssessments, webView, webEngine, properties));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
                 });
                 return null;
