@@ -12,8 +12,6 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.web.WebEngine;
 
-import javax.net.ssl.SNIHostName;
-import javax.print.DocFlavor;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.text.NumberFormat;
@@ -25,20 +23,28 @@ import java.util.*;
 public class SideControls{
     private WebEngine webEngine;
     private PropertyAssessments customCollection;
-    private PropertyAssessments propertyAssessments;
+    private PropertyAssessments propertyAssessmentsMaster; //The list that is loaded in at the start or when changing datasets
+    private PropertyAssessments propertyAssessments; //The subset
     private VBox vbox;
     TextArea textArea;
     private ComboBox neighbourhoodBox;
     private ComboBox wardBox;
+    private ComboBox classBox;
+    private TextField accountField;
+    private TextField addressField;
+    private ObservableList<PropertyAssessment> properties;
     private NumberFormat moneyMaker = NumberFormat.getCurrencyInstance();
 
     /**
      * Creates content for the side bar
      *
      */
-    public SideControls(PropertyAssessments propertyAssessments, WebEngine webEngine) throws IOException {
+    public SideControls(PropertyAssessments propertyAssessments, WebEngine webEngine, ObservableList<PropertyAssessment> properties) throws IOException {
+        moneyMaker.setMaximumFractionDigits(0);
         this.propertyAssessments = propertyAssessments;
+        this.propertyAssessmentsMaster = deepCopy(propertyAssessments);
         this.webEngine = webEngine;
+        this.properties = properties;
         vbox = new VBox();
         vbox.setPadding(new Insets(10,10,10,10));
         vbox.setSpacing(10);
@@ -50,21 +56,24 @@ public class SideControls{
         textArea.setMaxWidth(200);
 
 
-        VBox neighbourhood = neighbourhoodControl();
-        VBox ward = wardControl();
+        VBox neighbourhoodControls = neighbourhoodControl();
+        VBox wardControls = wardControl();
+        VBox classControls = classControl();
         HBox mapControls = mapControl();
-        VBox inputControl = inputControl();
+        VBox inputControls = inputControl();
+        HBox searchControls = searchControl();
 
         vbox.getChildren().addAll(
                 searchLabel,
-                inputControl,
-                neighbourhood,
-                ward,
+                inputControls,
+                neighbourhoodControls,
+                wardControls,
+                classControls,
                 textArea,
+                searchControls,
                 mapControls
         );
     }
-
 
     /**
      * Creates the controls for the map tab
@@ -103,16 +112,76 @@ public class SideControls{
         return controls;
     }
 
-    //shea addition
+
+    private HBox searchControl(){
+        HBox controls = new HBox();
+        controls.setSpacing(5);
+
+        Button searchBtn = new Button("Search");
+        searchBtn.setOnAction(event -> {
+            String account = accountField.getText().strip();
+            String address = addressField.getText().strip();
+            String neighbourhood = (String)neighbourhoodBox.getValue();
+            String ward = (String)wardBox.getValue();
+            String assessmentClass = (String)classBox.getValue();
+            neighbourhoodBox.setValue(null);
+            wardBox.setValue(null);
+
+
+
+            //adding this to fix the current implementation of creating a new list every time
+
+            if (!account.equals("")) {
+                propertyAssessments = propertyAssessments.getAssessmentsByAccount(account);
+            }
+            if (!address.equals("")) {
+                propertyAssessments = propertyAssessments.getAssessmentsByAddress(address);
+            }
+            if (neighbourhood != null) {
+                propertyAssessments = propertyAssessments.getAssessmentsByNeighbourhood(neighbourhood);
+            }
+            if (ward != null) {
+                propertyAssessments = propertyAssessments.getAssessmentsByWard(ward);
+            }
+            if (assessmentClass != null) {
+                propertyAssessments = propertyAssessments.getAssessmentsByClass(assessmentClass);
+            }
+
+            //table.setItems(properties);//removed!!
+            updateOList(propertyAssessments);
+            textArea.setText(propertyAssessments.toString());
+
+            accountField.clear();
+            addressField.clear();
+            //vis.update(searchAssessments);
+            //map.update(searchAssessments);
+        });
+
+        Button resetBtn = new Button("Reset");
+        resetBtn.setOnAction(event -> {
+            accountField.clear();
+            addressField.clear();
+            neighbourhoodBox.setValue(null);
+            classBox.setValue(null);
+            propertyAssessments = deepCopy(propertyAssessmentsMaster);
+            textArea.setText(propertyAssessments.toString());
+
+           updateOList(propertyAssessmentsMaster);
+        });
+
+
+        controls.getChildren().addAll(searchBtn, resetBtn);
+        return controls;
+    }
 
     private VBox inputControl(){
         VBox inputs = new VBox();
         inputs.setSpacing(5);
 
         final Label accountLabel = new Label("Account Number:");
-        TextField accountField = new TextField();
+        accountField = new TextField();
         final Label addressLabel = new Label("Address (#suite #house street):");
-        TextField addressField = new TextField();
+        addressField = new TextField();
 
 
 
@@ -143,7 +212,9 @@ public class SideControls{
         Button goButton = new Button("Go");
         HBox hBox = new HBox();
         hBox.setSpacing(10);
-        hBox.getChildren().addAll(neighbourhoodBox, goButton);
+        hBox.getChildren().addAll(neighbourhoodBox);
+
+        //NOTE: Remove these go buttons
 
         goButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -191,7 +262,9 @@ public class SideControls{
         Button goButton2 = new Button("Go");
         HBox hBox2 = new HBox();
         hBox2.setSpacing(10);
-        hBox2.getChildren().addAll(wardBox, goButton2);
+        hBox2.getChildren().addAll(wardBox);
+
+        //NOTE: Remove these go buttons
 
         goButton2.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -223,11 +296,49 @@ public class SideControls{
     }
 
     /**
+     * Creates controls for selecting a class
+     * @return
+     */
+    private VBox classControl(){
+        VBox classSelector = new VBox();
+        classSelector.setSpacing(5);
+
+        Set<String> classSet = propertyAssessments.getClassSet();
+        ObservableList<String> options = FXCollections.observableArrayList(classSet);
+        final Label assessLabel = new Label("Assessment Class:");
+        classBox = new ComboBox(options);
+
+        classSelector.getChildren().addAll(assessLabel, classBox);
+        return classSelector;
+    }
+
+    /**
      * Returns the panel VBox node so that it can be added to the JavaFX program
      * @return
      */
     public VBox getPanel(){
         return vbox;
+    }
+
+
+    /**
+     * Adds the list of properties that match the search query to the table list
+     *
+     * @param searchResults
+     */
+    private void updateOList(PropertyAssessments searchResults){
+        //Load assessments into observable list
+        properties.clear();
+        for(PropertyAssessment p : searchResults.propertyAssessmentsList)
+            properties.add(p); //add to collection to be returned
+    }
+
+    private PropertyAssessments deepCopy(PropertyAssessments properties){
+        PropertyAssessments newProperties = new PropertyAssessments();
+        for(PropertyAssessment p : properties.propertyAssessmentsList){
+            newProperties.addPropertyAssessment(p);
+        }
+        return newProperties;
     }
 
     private static Map<String, List<Location>> getCoordinates(String filename) throws IOException, NumberFormatException {

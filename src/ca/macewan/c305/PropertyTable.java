@@ -29,6 +29,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -48,6 +50,8 @@ public class PropertyTable extends Application {
     private PropertyAssessments propertyAssessments;
     private String filename = "Property_Assessment_Data__Current_Calendar_Year_.csv";
     private TextArea statsText;
+    WebView webView = new WebView();
+    WebEngine webEngine = webView.getEngine();
 
 
     Stage stage;
@@ -65,15 +69,21 @@ public class PropertyTable extends Application {
         propertyAssessments = makePropertyAssessments(filename);
 
         VBox tableBox = new VBox(10);
-        VBox searchBox = addVBox();
+        //VBox searchBox = addVBox();
 
         tableBox.setPadding(new Insets(10, 10, 10, 10));
-        searchBox.setPadding(new Insets(10,10,10,10));
+        //searchBox.setPadding(new Insets(10,10,10,10));
         BorderPane borderPane = new BorderPane();
-        searchBox.setBorder(new Border(new BorderStroke(Color.SILVER,
-                BorderStrokeStyle.SOLID, new CornerRadii(4), BorderWidths.DEFAULT)));
+        //searchBox.setBorder(new Border(new BorderStroke(Color.SILVER,
+        //        BorderStrokeStyle.SOLID, new CornerRadii(4), BorderWidths.DEFAULT)));
+
+        configureTable();
+
+
+        SideControls searchBox = new SideControls(propertyAssessments, webEngine, properties);
+
         borderPane.setCenter(tableBox);
-        borderPane.setLeft(searchBox);
+        borderPane.setLeft(searchBox.getPanel());
         borderPane.setPadding(new Insets(5));
 
         TabPane tabPane = new TabPane();
@@ -86,7 +96,6 @@ public class PropertyTable extends Application {
         tabPane.getTabs().addAll(tab1, tab2, tab3);
         tab1.setContent(borderPane);
         map =  new MapTab();
-        tab2.setContent(map.start(propertyAssessments));
         vis = new DataTab();
 
         Scene scene = new Scene(tabPane, 1200, 600);
@@ -121,7 +130,6 @@ public class PropertyTable extends Application {
         tableHeader.setHgrow(spacer, Priority.ALWAYS);
         tableHeader.getChildren().addAll(tableLabel, spacer, switchTheme);
 
-        configureTable();
 
         final Label searchLabel =  new Label("Find Property Assessment");
         tableLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
@@ -141,20 +149,7 @@ public class PropertyTable extends Application {
                 return null;
             }
         };
-        Task task2 = new Task<Void>() {
-            @Override public Void call() {
-                Platform.runLater(new Runnable() {
-                    @Override public void run() {
-                        try {
-                            tab2.setContent(map.start(propertyAssessments));
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
-                return null;
-            }
-        };
+        tab2.setContent(map.start(propertyAssessments, webView, webEngine));
         primaryStage.show();
         new Thread(task).start();
     }
@@ -278,24 +273,26 @@ public class PropertyTable extends Application {
 
             PropertyAssessments searchAssessments = propertyAssessments;
 
+
+
             if (!account.equals("")) {
                 searchAssessments = searchAssessments.getAssessmentsByAccount(account);
-                properties = FXCollections.observableArrayList(searchAssessments.getPropertyAssessments());
+                //properties = FXCollections.observableArrayList(searchAssessments.getPropertyAssessments());
             }
             if (!neighbourhood.equals("")) {
                 searchAssessments = searchAssessments.getAssessmentsByNeighbourhood(neighbourhood);
-                properties = FXCollections.observableArrayList(searchAssessments.getPropertyAssessments());
+                //properties = FXCollections.observableArrayList(searchAssessments.getPropertyAssessments());
             }
             if (!address.equals("")) {
                 searchAssessments = searchAssessments.getAssessmentsByAddress(address);
-                properties = FXCollections.observableArrayList(searchAssessments.getPropertyAssessments());
+                //properties = FXCollections.observableArrayList(searchAssessments.getPropertyAssessments());
             }
             if (assessmentClass != null) {
                 searchAssessments = searchAssessments.getAssessmentsByClass(assessmentClass);
-                properties = FXCollections.observableArrayList(searchAssessments.getPropertyAssessments());
+               // properties = FXCollections.observableArrayList(searchAssessments.getPropertyAssessments());
             }
 
-            table.setItems(properties);
+            //table.setItems(properties);
             statsText.setText(searchAssessments.toString());
 
             accountField.clear();
@@ -311,8 +308,8 @@ public class PropertyTable extends Application {
             classBox.setValue(null);
             statsText.setText(propertyAssessments.toString());
 
-            properties = FXCollections.observableArrayList(propertyAssessments.getPropertyAssessments());
-            table.setItems(properties);
+            //properties = FXCollections.observableArrayList(propertyAssessments.getPropertyAssessments());
+            //table.setItems(properties);
             vis.update(propertyAssessments);
             map.update(propertyAssessments);
         });
@@ -348,7 +345,7 @@ public class PropertyTable extends Application {
                         propertyAssessments = makePropertyAssessments(filename);
 
                         // reset the table
-                        table.setItems(properties);
+                        //table.setItems(properties);
 
                         // reset the stats box on the left border
                         statsText.setText(propertyAssessments.toString());

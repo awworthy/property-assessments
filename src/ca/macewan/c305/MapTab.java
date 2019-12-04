@@ -23,17 +23,16 @@ import java.text.NumberFormat;
 import java.util.*;
 
 /**
- * Map class handles the functions related to the Map tab in the property assessments program
+ * Map
  *
  * @author Dakota Doolaege
  */
 public class MapTab {
-    WebView webView = new WebView();
-    WebEngine webEngine = webView.getEngine();
-    PropertyAssessments propertyAssessments;
+    private WebView webView;
+    private WebEngine webEngine;
+    private PropertyAssessments propertyAssessments;
     PropertyAssessments customCollection;
-
-    NumberFormat moneyMaker = NumberFormat.getCurrencyInstance();
+    private ObservableList<PropertyAssessment> properties;
 
     /**
      * Creates a new BorderPane that contains the map and a side menu of options
@@ -41,16 +40,16 @@ public class MapTab {
      * @param propertyAssessments
      * @return borderPane that contains all the content for the map tab
      */
-    public BorderPane start(PropertyAssessments propertyAssessments) throws IOException {
-        moneyMaker.setMaximumFractionDigits(0);
+    public BorderPane start(PropertyAssessments propertyAssessments, WebView webView, WebEngine webEngine) throws IOException {
         this.propertyAssessments = propertyAssessments;
-
+        this.webView = webView;
+        this.webEngine = webEngine;
         BorderPane borderPane = new BorderPane();
         borderPane.setPadding(new Insets(5));
 
         //VBox searchBox = createSearch();
         VBox mapBox = createMap();
-        SideControls searchBox = new SideControls(propertyAssessments, webEngine);
+        SideControls searchBox = new SideControls(this.propertyAssessments, this.webEngine, properties);
 
         borderPane.setLeft(searchBox.getPanel());
         borderPane.setCenter(mapBox);

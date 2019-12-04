@@ -23,7 +23,7 @@ import java.util.*;
 
 public class PropertyAssessments {
     // This one will return the descriptive statistics
-    private List<PropertyAssessment> propertyAssessmentsList = new ArrayList<>();
+    public List<PropertyAssessment> propertyAssessmentsList = new ArrayList<>();
     private int length;
     private boolean sorted = true;
     private Set<String> assessClassSet = new HashSet<>();
