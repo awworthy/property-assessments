@@ -190,8 +190,6 @@ public class SideControls{
     private VBox neighbourhoodControl() throws IOException{
         VBox neighbourhood = new VBox();
         neighbourhood.setSpacing(5);
-        //for testing
-        //Map<String, List<Location>> neighborhoodBounds = getCoordinates("nBounds.csv");
         final Label neighbourhoodLabel = new Label("Select neighbourhood");
         Set<String> neighbourhoodSet = propertyAssessments.getNeighborhoodSet();
         ObservableList<String> options = FXCollections.observableArrayList(neighbourhoodSet);
@@ -200,7 +198,6 @@ public class SideControls{
         HBox hBox = new HBox();
         hBox.setSpacing(10);
         hBox.getChildren().addAll(neighbourhoodBox);
-
         neighbourhood.getChildren().addAll(neighbourhoodLabel, hBox);
         return neighbourhood;
     }
@@ -213,8 +210,6 @@ public class SideControls{
     private VBox wardControl() throws IOException {
         VBox ward = new VBox();
         ward.setSpacing(5);
-        //Map<String, List<Location>> wardBounds = getCoordinates("wBound.csv");
-
         final Label wardLabel = new Label("Select ward");
         String[] wardSet = propertyAssessments.getSortedWardList();
         ObservableList<String> options2 = FXCollections.observableArrayList(wardSet);
@@ -223,7 +218,6 @@ public class SideControls{
         HBox hBox2 = new HBox();
         hBox2.setSpacing(10);
         hBox2.getChildren().addAll(wardBox);
-
         ward.getChildren().addAll(wardLabel, hBox2);
         return ward;
     }
@@ -289,24 +283,21 @@ public class SideControls{
         Scanner file = new Scanner(Paths.get(filename));
         int n = getLength(file);
         file = new Scanner(Paths.get(filename));
+
         Map<String, List<Location>> coordinates = new HashMap<>();
         List<Location> bounds = new ArrayList<>();
-
         String currentLine = file.nextLine(); // set currentLine to first line in file
         currentLine = currentLine.replaceFirst("^\uFEFF", "");
         String[] lineArray = currentLine.split(","); // split line by commas
         String name = lineArray[0]; // set name to first name of file
-        String compare = "";
-        Location coordinate = new Location(Double.parseDouble(lineArray[1]), Double.parseDouble(lineArray[2])); // set coordinate
-        bounds.add(coordinate); // put first coordinate in bounds list
+        //Location coordinate = new Location(Double.parseDouble(lineArray[1]), Double.parseDouble(lineArray[2])); // set coordinate
+        bounds.add( new Location(Double.parseDouble(lineArray[1]), Double.parseDouble(lineArray[2]))); // put first coordinate in bounds list
         for (int i = 0 ; i <= n && file.hasNextLine() ; i++){
             // iterate through each line and make a Property Assessment from each
             currentLine = file.nextLine(); // iterate to next line
             lineArray = currentLine.split(",");
-            compare = lineArray[0]; ; // set compare string to this line's name
-            coordinate = new Location(Double.parseDouble(lineArray[1]), Double.parseDouble(lineArray[2])); // set coordinate
-            if(compare.equals(name) && file.hasNextLine()){
-                bounds.add(coordinate); // if compare and name are equal, add coordinate to bounds list
+            if(lineArray[0].equals(name) && file.hasNextLine()){
+                bounds.add( new Location(Double.parseDouble(lineArray[1]), Double.parseDouble(lineArray[2]))); // if compare and name are equal, add coordinate to bounds list
             }
             else{
                 List<Location>boundsCopy = new ArrayList<>(); // if compare an name are not equal, make a deep copy of bounds list
@@ -315,8 +306,8 @@ public class SideControls{
                 }
                 coordinates.put(name, boundsCopy); // add name(key) and deep copy of bounds list(value) to coordinates hash map
                 bounds.clear(); // clear bounds list
-                bounds.add(coordinate); // add coordinate to boudns list
-                name = compare; // reset name
+                bounds.add( new Location(Double.parseDouble(lineArray[1]), Double.parseDouble(lineArray[2]))); // add coordinate to boudns list
+                name = lineArray[0]; // reset name
             }
 
         }
@@ -329,17 +320,16 @@ public class SideControls{
      * @return
      */
     public Location getCentre(List<Location>coordinates) {
-        Double minLatitude = 90.0;
-        Double maxLatitude = -90.0;
-        Double minLongitude = 180.0;
-        Double maxLongitude = -180.0;
+        Double minLatitude = 90.0, maxLatitude = -90.0, minLongitude = 180.0, maxLongitude = -180.0;
         for (Location l : coordinates) {
+            // Set max and min Latitude
             if (l.getLatitude() > maxLatitude) {
                 maxLatitude = l.getLatitude();
             }
             if (l.getLatitude() < minLatitude) {
                 minLatitude = l.getLatitude();
             }
+            // Set max and min Longitude
             if (l.getLongitude() > maxLongitude) {
                 maxLongitude = l.getLongitude();
             }
@@ -347,6 +337,7 @@ public class SideControls{
                 minLongitude = l.getLongitude();
             }
         }
+        // return centre coordinate based on max and min latitude and longitude
         return new Location((maxLatitude + minLatitude) / 2, (maxLongitude + minLongitude) / 2);
     }
 
@@ -358,19 +349,16 @@ public class SideControls{
      */
     private void jsGoMap(Location centre, double zoom, List<Location> bounds){
         StringBuilder jsArray = new StringBuilder();
-        jsArray.append(centre.getLatitude() + ", " + centre.getLongitude() + ", " + zoom);
-        //webEngine.executeScript("legend("+ propertyAssessments.getMax() + ","+ propertyAssessments.getMin() +")");
-        webEngine.executeScript("setCentreAndZoom(" + jsArray.toString() + ")");
-        StringBuilder jsArray2 = new StringBuilder();
-        jsArray2.setLength(0);
-        jsArray2.append("[");
+        jsArray.append(centre.getLatitude() + ", " + centre.getLongitude() + ", " + zoom); // set js string
+        webEngine.executeScript("setCentreAndZoom(" + jsArray.toString() + ")"); // execute js function using js string
+        jsArray.setLength(0); // reset string
+        jsArray.append("[");
         for (Location l: bounds) {
-            jsArray2.append("[" + l.getLatitude() + ", " + l.getLongitude() + "],");
+            jsArray.append("[" + l.getLatitude() + ", " + l.getLongitude() + "],"); // set js string
         }
-
-        jsArray2.deleteCharAt(jsArray2.length()-1);
-        jsArray2.append("]");
-        webEngine.executeScript("drawBoundary(" + jsArray2.toString() + ")");
+        jsArray.deleteCharAt(jsArray.length()-1);
+        jsArray.append("]");
+        webEngine.executeScript("drawBoundary(" + jsArray.toString() + ")"); // execute js function using js string
     }
 
 
