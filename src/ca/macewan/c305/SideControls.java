@@ -59,7 +59,6 @@ public class SideControls{
         textArea = new TextArea();
         textArea.setMaxWidth(200);
 
-
         VBox neighbourhoodControls = neighbourhoodControl();
         VBox wardControls = wardControl();
         VBox classControls = classControl();
@@ -67,6 +66,7 @@ public class SideControls{
         VBox inputControls = inputControl();
         HBox searchControls = searchControl();
 
+        //Items that get added to the sidebar
         vbox.getChildren().addAll(
                 searchLabel,
                 inputControls,
@@ -79,8 +79,13 @@ public class SideControls{
         );
     }
 
+    /**
+     * Resets the master list after loading in a new dataset
+     */
     public void updateMasterList(){
         this.propertyAssessmentsMaster = deepCopy(propertyAssessments);
+        textArea.setText(propertyAssessments.toString());
+        updateOList(propertyAssessments);
     }
 
     /**
@@ -90,6 +95,8 @@ public class SideControls{
     private HBox mapControl(){
         HBox controls = new HBox();
         controls.setSpacing(5);
+
+        //Heatmap bttn
         Button heatMapBtn = new Button();
         heatMapBtn.setMaxWidth(150);
         heatMapBtn.setText("Activate Heatmap");
@@ -101,7 +108,8 @@ public class SideControls{
                 }
             }
         });
-        //Clear Map Bttn
+
+        //Clear Map bttn
         Button clearMapBtn = new Button();
         clearMapBtn.setMaxWidth(150);
         clearMapBtn.setText("Clear Map");
@@ -120,7 +128,10 @@ public class SideControls{
         return controls;
     }
 
-
+    /**
+     * Creates the search controls
+     * @return
+     */
     private HBox searchControl(){
         HBox controls = new HBox();
         controls.setSpacing(5);
@@ -137,10 +148,7 @@ public class SideControls{
             neighbourhoodBox.setValue(null);
             wardBox.setValue(null);
 
-
-
             //adding this to fix the current implementation of creating a new list every time
-
             if (!account.equals("")) {
                 propertyAssessments.propertyAssessmentsList = propertyAssessments.getAssessmentsByAccount(account).propertyAssessmentsList;
             }
@@ -158,7 +166,6 @@ public class SideControls{
                         jsGoMap(centre, 14, neighborhoodCoordinates);
                     }
                 }
-
             if (ward != null) {
                 propertyAssessments.propertyAssessmentsList = propertyAssessments.getAssessmentsByWard(ward).propertyAssessmentsList;
 
@@ -176,14 +183,11 @@ public class SideControls{
                 propertyAssessments.propertyAssessmentsList = propertyAssessments.getAssessmentsByClass(assessmentClass).propertyAssessmentsList;
             }
 
-            //table.setItems(properties);//removed!!
             updateOList(propertyAssessments);
             textArea.setText(propertyAssessments.toString());
 
             accountField.clear();
             addressField.clear();
-            //vis.update(searchAssessments);
-            //map.update(searchAssessments);
         });
 
         Button resetBtn = new Button("Reset");
@@ -199,11 +203,14 @@ public class SideControls{
             updateOList(propertyAssessmentsMaster);
         });
 
-
         controls.getChildren().addAll(searchBtn, resetBtn);
         return controls;
     }
 
+    /**
+     * Creates the input fields
+     * @return
+     */
     private VBox inputControl(){
         VBox inputs = new VBox();
         inputs.setSpacing(5);
@@ -213,15 +220,9 @@ public class SideControls{
         final Label addressLabel = new Label("Address (#suite #house street):");
         addressField = new TextField();
 
-
-
         inputs.getChildren().addAll(accountLabel, accountField, addressLabel, addressField);
         return inputs;
     }
-
-
-
-
 
     /**
      * Creates the controls for the neighbourhood selector
@@ -294,7 +295,6 @@ public class SideControls{
         return vbox;
     }
 
-
     /**
      * Adds the list of properties that match the search query to the table list
      *
@@ -307,6 +307,11 @@ public class SideControls{
             properties.add(p); //add to collection to be returned
     }
 
+    /**
+     * Creates a deep copy of a PropertyAssessments to prevent mutability
+     * @param properties
+     * @return
+     */
     private PropertyAssessments deepCopy(PropertyAssessments properties){
         PropertyAssessments newProperties = new PropertyAssessments();
         for(PropertyAssessment p : properties.propertyAssessmentsList){
@@ -315,6 +320,13 @@ public class SideControls{
         return newProperties;
     }
 
+    /**
+     *
+     * @param filename
+     * @return
+     * @throws IOException
+     * @throws NumberFormatException
+     */
     private static Map<String, List<Location>> getCoordinates(String filename) throws IOException, NumberFormatException {
         Scanner file = new Scanner(Paths.get(filename));
         int n = getLength(file);
@@ -353,6 +365,11 @@ public class SideControls{
         return coordinates;
     }
 
+    /**
+     *
+     * @param coordinates
+     * @return
+     */
     public Location getCentre(List<Location>coordinates) {
         Double minLatitude = 90.0;
         Double maxLatitude = -90.0;
@@ -375,7 +392,12 @@ public class SideControls{
         return new Location((maxLatitude + minLatitude) / 2, (maxLongitude + minLongitude) / 2);
     }
 
-    //shea addition
+    /**
+     *
+     * @param centre
+     * @param zoom
+     * @param bounds
+     */
     private void jsGoMap(Location centre, double zoom, List<Location> bounds){
         StringBuilder jsArray = new StringBuilder();
         jsArray.append(centre.getLatitude() + ", " + centre.getLongitude() + ", " + zoom);
@@ -402,7 +424,11 @@ public class SideControls{
 
     }
 
-
+    /**
+     *
+     * @param file
+     * @return
+     */
     private static int getLength(Scanner file){
         int n = 0;
         if (file.hasNextLine()) {

@@ -126,6 +126,7 @@ public class PropertyTable extends Application {
 
         HBox tableHeader = new HBox();
         tableHeader.setHgrow(spacer, Priority.ALWAYS);
+        tableHeader.setSpacing(5);
         /* File open button in the following hBox */
         HBox fileBox = makeFileBox();
         tableHeader.getChildren().addAll(tableLabel, spacer, switchTheme, fileBox);
@@ -238,7 +239,7 @@ public class PropertyTable extends Application {
      */
     private HBox makeFileBox() {
         FileChooser fileChooser = new FileChooser();
-        final Button openFileButton = new Button("Choose custom file");
+        final Button openFileButton = new Button("Load Custom Dataset");
         HBox hBox = new HBox(10);
         openFileButton.setOnAction(
                 e -> {

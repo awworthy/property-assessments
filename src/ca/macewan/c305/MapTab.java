@@ -1,59 +1,42 @@
 package ca.macewan.c305;
 
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
-
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Paths;
-import java.text.NumberFormat;
-import java.util.*;
 
 /**
- * Map
+ * Map tab class
  *
  * @author Dakota Doolaege
  */
 public class MapTab {
     private WebView webView;
     private WebEngine webEngine;
-    private PropertyAssessments propertyAssessments;
-    PropertyAssessments customCollection;
-    private ObservableList<PropertyAssessment> properties;
 
     /**
      * Creates a new BorderPane that contains the map and a side menu of options
      *
      * @param propertyAssessments
+     * @param webView
+     * @param webEngine
+     * @param properties
      * @return borderPane that contains all the content for the map tab
      */
     public BorderPane start(PropertyAssessments propertyAssessments, WebView webView, WebEngine webEngine, ObservableList<PropertyAssessment> properties) throws IOException {
-        this.propertyAssessments = propertyAssessments;
         this.webView = webView;
         this.webEngine = webEngine;
         BorderPane borderPane = new BorderPane();
         borderPane.setPadding(new Insets(5));
 
-        //VBox searchBox = createSearch();
         VBox mapBox = createMap();
         SideControls searchBox = new SideControls(propertyAssessments, this.webEngine, properties);
 
         borderPane.setLeft(searchBox.getPanel());
         borderPane.setCenter(mapBox);
-
         return borderPane;
     }
 
@@ -80,9 +63,4 @@ public class MapTab {
         VBox.setVgrow(webView, Priority.ALWAYS);
         return vbox;
     }
-
-
-
-
-
 }
