@@ -47,6 +47,7 @@ public class PropertyTable extends Application {
     private String filename = "Property_Assessment_Data__Current_Calendar_Year_.csv";
     WebView webView = new WebView();
     WebEngine webEngine = webView.getEngine();
+    SideControls searchBox;
 
     Stage stage;
     DataTab vis;
@@ -71,7 +72,7 @@ public class PropertyTable extends Application {
 
         configureTable();
 
-        SideControls searchBox = new SideControls(propertyAssessments, webEngine, properties);
+        searchBox = new SideControls(propertyAssessments, webEngine, properties);
 
         borderPane.setCenter(tableBox);
         borderPane.setLeft(searchBox.getPanel());
@@ -125,7 +126,9 @@ public class PropertyTable extends Application {
 
         HBox tableHeader = new HBox();
         tableHeader.setHgrow(spacer, Priority.ALWAYS);
-        tableHeader.getChildren().addAll(tableLabel, spacer, switchTheme);
+        /* File open button in the following hBox */
+        HBox fileBox = makeFileBox();
+        tableHeader.getChildren().addAll(tableLabel, spacer, switchTheme, fileBox);
 
 
         final Label searchLabel =  new Label("Find Property Assessment");
@@ -245,7 +248,12 @@ public class PropertyTable extends Application {
                         filename = file.getPath();
                     try {
                         // update the main propertyAssessments collection class
-                        //propertyAssessments = makePropertyAssessments(filename);
+                        System.out.println("here");
+                        propertyAssessments.propertyAssessmentsList.clear();
+                        System.out.println(propertyAssessments.propertyAssessmentsList.size());
+                        makePropertyAssessments(filename);
+                        searchBox.updateMasterList();
+                        System.out.println(propertyAssessments.propertyAssessmentsList.size());
 
                         // reset the table
                         //table.setItems(properties);

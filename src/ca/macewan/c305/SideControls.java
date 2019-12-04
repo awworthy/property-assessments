@@ -79,6 +79,10 @@ public class SideControls{
         );
     }
 
+    public void updateMasterList(){
+        this.propertyAssessmentsMaster = deepCopy(propertyAssessments);
+    }
+
     /**
      * Creates the controls for the map tab
      * @return
@@ -123,6 +127,8 @@ public class SideControls{
 
         Button searchBtn = new Button("Search");
         searchBtn.setOnAction(event -> {
+
+            System.out.println(propertyAssessments.propertyAssessmentsList.size());
             String account = accountField.getText().strip();
             String address = addressField.getText().strip();
             String neighbourhood = (String)neighbourhoodBox.getValue();
