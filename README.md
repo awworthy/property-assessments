@@ -1,5 +1,5 @@
 # README
-## Property Assessments Final Project
+## Property Assessments Program
 ## README Contents:
 - Collaborators
 - Core Project
